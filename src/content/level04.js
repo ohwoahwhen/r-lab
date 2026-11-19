@@ -11,6 +11,8 @@ export default {
   missions: [
     {
       id: 'l4m1',
+      theory:
+        "**Tidy data** has one rule with three consequences: each variable is a column, each observation is a row, each cell is one value.\n\nA wide table with `pushups`, `plank_sec` and `grip_kg` as separate columns breaks it, because \"which test\" is a variable that has been smeared across column headers instead of living in a column. You can see it is a variable because you want to group by it.\n\nWide tables are for humans reading a page. Long tables are for software: ggplot wants to know which column to colour by, and a model wants a column for the predictor. Pivoting is just switching between an audience of people and an audience of functions.",
       title: 'Long is the useful shape',
       xp: 45,
       teach:
@@ -44,6 +46,8 @@ export default {
     },
     {
       id: 'l4m2',
+      theory:
+        "`csplus_b3` holds two facts \u2014 which cue, which block \u2014 glued into one name. That is a reliable sign the spreadsheet was laid out for a person to read across, not for a computer to read down.\n\nThe capture groups in the pattern mark the pieces you want to keep: everything in brackets becomes a column, everything outside is scaffolding to be matched and discarded.\n\nRegular expressions are worth the hour they take to learn. They are the difference between fixing a naming scheme in one line and fixing it by hand in a spreadsheet, which is both slower and unrepeatable.",
       title: 'Two things in one column name',
       xp: 55,
       teach:
@@ -79,6 +83,8 @@ export default {
     },
     {
       id: 'l4m3',
+      theory:
+        "Pivoting is lossless. Long and wide hold exactly the same information, and you can go back and forth all day without changing a single value. Only the shape changes, and shape is a question about audience.\n\nWide is what you want for a paired comparison, where each person needs their two scores side by side, and for a table in a paper where a reader scans across a row.\n\nOne asymmetry worth noticing: going wider can *create* `NA`s where a combination never occurred. The missing data was always implicit; widening makes it explicit, which is usually an improvement.",
       title: 'And back again',
       xp: 50,
       teach:
@@ -118,6 +124,8 @@ export default {
     },
     {
       id: 'l4m4',
+      theory:
+        "`\"2h 45m\"` is text because someone typed it for a human to read. R will happily store it, sort it alphabetically, and refuse to average it.\n\nType is not a technicality. It determines what operations are even possible, and a column that *looks* numeric but is stored as text will break a model with an error message that mentions neither the column nor the cause.\n\nThe general shape of the job: find the structure hiding in the text, name the pieces, convert them. The parsing is the easy half. Noticing that a column is the wrong type in the first place is the skill \u2014 which is why `glimpse()` and printing a tibble, with its types above every column, earn their place in your first look at any dataset.",
       title: 'Text that should be a number',
       xp: 55,
       teach:
@@ -160,6 +168,8 @@ export default {
     },
     {
       id: 'l4m5',
+      theory:
+        "A join matches rows between two tables using a shared key. `left_join()` keeps every row of the left table whatever happens, which makes it the safe default: your data cannot silently shrink.\n\nWhat it can do is leave `NA`s where no match was found, and that count is a data-quality measurement. Six unmatched trails is not a nuisance to hide \u2014 it is the honest answer to \"how clean are these names really?\", and it belongs in a footnote.\n\nThe other thing to watch is the opposite failure. If the key is not unique in the right-hand table, each left row matches several right rows and your data gets *bigger*. Checking `nrow()` before and after a join takes two seconds and catches a class of error that is otherwise invisible until your degrees of freedom look strange.",
       title: 'Joining a lookup table',
       xp: 55,
       teach:
@@ -202,6 +212,8 @@ export default {
     },
     {
       id: 'l4m6',
+      theory:
+        "Any column a human typed will eventually contain every spelling they thought of. Dropdowns help; nothing fixes it completely.\n\n`case_when()` reads as a chain of \"if this, then that\", and the first match wins. The order is therefore part of the logic, not a style choice \u2014 put a broad rule first and it will swallow the specific one below it.\n\n`.default` is the dangerous comfort. Everything you did not anticipate lands there silently, so a label you never imagined gets quietly filed under the last category. Which is why you `count()` the result afterwards: the check is not optional, it is the other half of the technique.",
       title: 'Labels a human typed',
       xp: 55,
       teach:
@@ -243,6 +255,8 @@ export default {
     },
     {
       id: 'l4boss',
+      theory:
+        "Order is the whole lesson here, and the rule of thumb is: decide who is in your sample before you compute anything about them.\n\nClean the labels before you group, or you group on noise. Drop the incomplete cases before you reverse-score, or you spend effort on rows you are about to discard. Reshape last, once each value means what you think it means.\n\nAnd notice what reshaping did to counting. After pivoting, each person appears ten times, so `n()` counts rows and not people. The fix \u2014 `n_distinct(id)` \u2014 is easy. Spotting that you needed it is the part worth practising, because a \"sample size\" ten times too large does not look wrong until someone checks.",
       title: 'Boss: the inherited spreadsheet',
       boss: true,
       xp: 150,

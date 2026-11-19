@@ -11,6 +11,8 @@ export default {
   missions: [
     {
       id: 'l2m1',
+      theory:
+        "dplyr is built as a small set of verbs that all obey the same contract: a data frame goes in, a data frame comes out, and the data is always the first argument. That is what makes them chain.\n\nBecause the shape of the output is predictable, you can read a pipeline you have never seen and know what each step did to the table. Compare that with a spreadsheet, where the operations happened in some order nobody recorded and the only evidence is the final file.\n\nTwo of the verbs are about shape: `select()` changes which columns you have, `filter()` changes which rows. Almost everything else is a variation on those two axes.",
       title: 'Keep the columns you want',
       xp: 35,
       teach:
@@ -38,6 +40,8 @@ export default {
     },
     {
       id: 'l2m2',
+      theory:
+        "`starts_with()` and friends are a small language for naming columns, called tidyselect. It exists because real questionnaires have `ses1` through `ses10`, and nobody should type all ten.\n\nThe alternative is selecting by position \u2014 `df[, 2:11]` \u2014 and that is a trap. It is correct exactly until someone inserts a column, at which point it silently selects the wrong eleven columns and nothing errors. Selecting by name fails loudly instead, which is what you want.\n\nThe habit generalises: prefer describing *what you want* over *where it currently is*. Data moves.",
       title: 'Select without typing ten names',
       xp: 40,
       teach:
@@ -65,6 +69,8 @@ export default {
     },
     {
       id: 'l2m3',
+      theory:
+        "`filter()` keeps the rows where your condition is `TRUE`. That sounds obvious until you remember the third possibility.\n\nA condition can come back `TRUE`, `FALSE`, or `NA` \u2014 and `NA` is not `TRUE`, so those rows are dropped. Filter on `age > 18` in a dataset where some ages are missing and those people vanish, with no warning and no error. It is the most common way a sample quietly shrinks.\n\nAnd the double equals: `=` assigns, `==` compares. R is one of the friendlier languages here, because it will usually refuse rather than silently assign inside a function call.",
       title: 'Keep the rows you want',
       xp: 40,
       teach:
@@ -92,6 +98,8 @@ export default {
     },
     {
       id: 'l2m4',
+      theory:
+        "A comma inside `filter()` means **and**, and `|` means or. English is the opposite way round from logic here \u2014 \"participants in the control and mindfulness groups\" is, to a computer, `group == \"Control\" | group == \"Mindfulness\"`. Nobody is in both.\n\n`%in%` exists because chaining `|` gets unreadable fast, and because it says what you mean: is this value one of these?\n\n`is.na()` is a separate function rather than a comparison for a good reason. `x == NA` asks \"is this unknown value equal to some other unknown value?\", and the only honest answer is `NA`. So the test never selects anything, and you get an empty result instead of an error.",
       title: 'Several conditions at once',
       xp: 45,
       teach:
@@ -122,6 +130,8 @@ export default {
     },
     {
       id: 'l2m5',
+      theory:
+        "Sorting changes nothing about your data \u2014 same rows, same values, different order. It is purely for reading.\n\nTwo details worth knowing. `arrange()` is **stable**: rows that tie keep their original relative order, so the same code gives the same table every time, which matters if you are pasting results into a paper.\n\nAnd `NA` always sorts to the bottom, whether you ask for ascending or descending. R refuses to pretend it knows where an unknown value belongs. So \"the top 5\" quietly means \"the top 5 of the ones we know about\".",
       title: 'Put it in order',
       xp: 40,
       teach:
@@ -150,6 +160,8 @@ export default {
     },
     {
       id: 'l2boss',
+      theory:
+        "Order matters in a pipeline, for two different reasons.\n\nPractically: filter early. Every later step then works on less data, which on a real dataset is the difference between instant and a coffee break.\n\nLogically: each step sees only what the previous one left. Select away a column and you cannot filter on it afterwards. Sort before filtering and you did the sorting for nothing.\n\nThe deeper value is that the pipeline *is* the record. Anyone, including you next year, can read exactly which rows were excluded and why. That is reproducibility \u2014 not a virtue you add at the end, just a side effect of writing the steps down.",
       title: 'Boss: the inspection shortlist',
       boss: true,
       xp: 130,

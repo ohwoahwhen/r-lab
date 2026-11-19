@@ -10,6 +10,8 @@ export default {
   missions: [
     {
       id: 'l1m1',
+      theory:
+        "A name in R is a label tied to a value, not a box you put things in. `pack_kg <- 18` means \"from now on, the label `pack_kg` refers to 18\". Point the label somewhere else and the old value is simply gone \u2014 R has no undo, and no record that it ever existed.\n\nThe arrow is directional on purpose: it shows which way the value travels. R also accepts `=`, but almost nobody uses it for assignment, because the arrow makes the direction visible at a glance in a long script.\n\nNotice that assigning prints nothing. R separates *doing* something from *showing* you something, which is why your first hour can feel like nothing is happening. If you want to see a value, you have to ask.",
       title: 'Say it with an arrow',
       xp: 30,
       teach:
@@ -33,6 +35,8 @@ export default {
     },
     {
       id: 'l1m2',
+      theory:
+        "R's basic unit is not a number, it is a **vector** \u2014 an ordered run of values. A lone `18` is just a vector of length one. That is not pedantry; it is the reason `mean(weights)` needs no loop, and why `weights * 2` doubles every element at once.\n\nComing from almost any other language, this is the adjustment. The instinct to write \"for each element, do X\" is usually wrong in R, and code written that way is both longer and slower.\n\nOne catch: a vector holds a single type. Put a word in a vector of numbers and R will quietly turn *every* number into text rather than complain. That silent conversion is behind a lot of \"why is my column character?\".",
       title: 'A vector of packs',
       xp: 35,
       teach:
@@ -58,6 +62,8 @@ export default {
     },
     {
       id: 'l1m3',
+      theory:
+        "A data frame is a list of vectors forced to be the same length and stood side by side. That is why a column has a type and a row does not \u2014 a row cuts across several vectors at once.\n\nSo \"look at the data\" is not a nicety. `nrow()` is a hypothesis test with yourself: you expect roughly this many rows, and if the number is wrong you stop and find out why rather than analysing something you do not recognise.\n\nThe expensive mistakes in data analysis are almost never clever ones. They are a filter that removed more than you thought, a join that duplicated rows, a file that only half-loaded \u2014 and every one of them shows up as a row count that is not what you expected.",
       title: 'How big is this thing?',
       xp: 35,
       teach:
@@ -78,6 +84,8 @@ export default {
     },
     {
       id: 'l1m4',
+      theory:
+        "`NA` does not mean zero and it does not mean blank. It means *a value exists and I do not know what it is*. Once you read it that way, everything NA does makes sense: the mean of a set of numbers, one of which is unknown, is itself unknown. R returns `NA` rather than guessing.\n\nThat is a safety feature, not an inconvenience. A language that quietly skipped missing values would let you report a mean of 30 people as if it were a mean of 180.\n\n`na.rm = TRUE` is you overriding that, which makes it a decision rather than a default. You are saying \"analyse the people who answered\". Often that is right, but it changes your sample, and that change belongs in your write-up rather than buried in an argument.",
       title: 'One column, please',
       xp: 40,
       teach:
@@ -102,6 +110,8 @@ export default {
     },
     {
       id: 'l1m5',
+      theory:
+        "`mean(sqrt(abs(x)))` is read inside out: your eye starts in the middle, where the data is, and works outwards. The pipe lets you write the same thing in the order the steps actually happen.\n\nThat is the entire point. The computer does not care \u2014 `x |> mean()` compiles to `mean(x)`. The pipe is a tool for the human reading it in six months, which is usually you.\n\nYou will meet two of them. `|>` is built into R itself; `%>%` comes from the magrittr package and is what most code written before 2021 uses. They behave the same for everyday work, and this course uses the native one because it needs no packages.",
       title: 'The pipe',
       xp: 45,
       teach:
@@ -125,6 +135,8 @@ export default {
     },
     {
       id: 'l1boss',
+      theory:
+        "The idiom at the centre of this mission is **logical subsetting**. `hikes$distance_km > 15` does not give you an answer; it gives you one TRUE or FALSE per row. Feed that vector into `[ ]` and you keep the TRUE ones.\n\nThis is also why `sum()` counts things. In R, `TRUE` is 1 and `FALSE` is 0, so adding up a vector of TRUE/FALSE counts how many were TRUE. `mean()` on the same vector gives you the proportion \u2014 a trick worth remembering.\n\nEverything dplyr does in the next few levels is this, wearing better clothes. `filter()` is logical subsetting with nicer syntax.",
       title: 'Boss: the first briefing',
       boss: true,
       xp: 120,

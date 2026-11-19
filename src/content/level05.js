@@ -11,6 +11,8 @@ export default {
   missions: [
     {
       id: 'l5m1',
+      theory:
+        "ggplot is not a collection of chart functions. It is a grammar: you name the data, say which columns map to which visual properties, and add layers that draw something. A scatter plot is not a thing in ggplot \u2014 it is points, positioned by two variables.\n\nThat is why you can build a figure nobody wrote a function for. Once position, colour, size and shape are all just channels you can map data to, new chart types are sentences you compose rather than functions you hope exist.\n\nThe `+` instead of `|>` is a historical accident \u2014 ggplot predates the pipe. Think of it as \"and then add\", and remember it has to end the line, because R reads a line ending in `+` as unfinished and a line starting with `+` as finished-then-nonsense.",
       title: 'Three ingredients',
       xp: 45,
       teach:
@@ -36,6 +38,8 @@ export default {
     },
     {
       id: 'l5m2',
+      theory:
+        "Everything confusing about ggplot comes back to one line: inside `aes()` means *from the data*, outside means *a fixed value*.\n\n`colour = pack_kg` says \"let the data decide each point's colour\", so ggplot builds a scale and a legend. `colour = \"red\"` outside `aes()` says \"make them all red\". Put `colour = \"red\"` *inside* `aes()` and you get something surprising but perfectly logical: a variable with one value called \"red\", a legend, and points in ggplot's default first colour, which is not red.\n\nWhen a plot comes out with an unwanted legend, this is nearly always why.",
       title: 'A third variable, for free',
       xp: 50,
       teach:
@@ -61,6 +65,8 @@ export default {
     },
     {
       id: 'l5m3',
+      theory:
+        "Every layer quietly runs a statistical transformation before drawing. Usually it is `identity` \u2014 draw the numbers as given. Sometimes it is not.\n\n`geom_bar()` defaults to counting rows, which is why it needs only an x. `geom_col()` draws the heights you supply. Same picture, completely different question: one asks \"how many?\", the other \"how much?\".\n\nKnowing which geoms do maths for you is what stops the classic bug of summarising your data carefully and then handing it to a geom that summarises it again.",
       title: 'Bars of numbers you already have',
       xp: 50,
       teach:
@@ -98,6 +104,8 @@ export default {
     },
     {
       id: 'l5m4',
+      theory:
+        "A histogram has a parameter in it, and that parameter changes the story. Wide bins smooth a distribution into a single hump; narrow bins shatter it into spikes. Neither is the truth \u2014 both are views.\n\nSo the number of bins is a decision you are making about what to show, which is why ggplot prints that slightly nagging message about picking a better value. It is reminding you that it guessed.\n\nLook at more than one bin width before you believe a shape. Bimodality in particular can appear and vanish depending entirely on where the bin edges fall.",
       title: 'The shape of a distribution',
       xp: 50,
       teach:
@@ -129,6 +137,8 @@ export default {
     },
     {
       id: 'l5m5',
+      theory:
+        "The box spans the middle half of the data, the line is the median, and the whiskers reach the furthest point within 1.5 times the box height. Anything beyond is drawn individually. That convention is Tukey's and it is arbitrary, which is worth knowing before you call those points \"outliers\" as though the plot had tested something.\n\nA boxplot is a five-number summary, so it hides everything a summary hides. Two groups with identical boxplots can have completely different distributions \u2014 one flat, one strongly bimodal.\n\nFor small samples, show the points. A boxplot of six observations has the authority of a statistical graphic and the information content of a shrug.",
       title: 'Boxes by group',
       xp: 50,
       teach:
@@ -167,6 +177,8 @@ export default {
     },
     {
       id: 'l5m6',
+      theory:
+        "Default axis labels are column names, and column names are written for the computer: lowercase, no spaces, no units. `elev_m` is fine in code and not fine in a figure caption.\n\nFigures travel. Yours will end up on a slide, in a thesis, screenshotted into a group chat \u2014 always separated from the paragraph that explained it. A figure has to survive on its own.\n\nWhile you are there: units belong in the axis label, and meaning should never ride on colour alone. Roughly one man in twelve has some form of red-green colour deficiency, and they are reading your poster too.",
       title: 'Say what it is',
       xp: 50,
       teach:
@@ -210,6 +222,8 @@ export default {
     },
     {
       id: 'l5boss',
+      theory:
+        "Rebuilding someone else's figure is the fastest way to learn to read figures. You stop seeing a picture and start seeing decisions: what is on each axis, what the colours encode, which rows made it in, what got dropped.\n\nIt is also a real test of a methods section. If you cannot reproduce a figure from the description given, the description was incomplete \u2014 and that is exactly the exercise reviewers and replication teams perform on published work.\n\nNote what is being checked here. Not pixels \u2014 the *structure*: layers, mappings, data, labels. Two plots can look identical and be built from different data, and only one of them is right.",
       title: 'Boss: recreate the chart',
       boss: true,
       kind: 'plot',

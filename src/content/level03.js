@@ -10,6 +10,8 @@ export default {
   missions: [
     {
       id: 'l3m1',
+      theory:
+        "`mutate()` works on whole columns at once. `elev_m / distance_km` is not a loop over rows \u2014 it is one division applied to two vectors, element by element, in one go.\n\nThis is why dplyr code is so short. The row-by-row thinking you might bring from Excel, where you write a formula in one cell and drag it down, is already built in.\n\nA useful detail: inside a single `mutate()` you can use a column you created a line earlier. The steps run in order, so you can build up a calculation in readable pieces instead of one unreadable expression.",
       title: 'Add a column',
       xp: 40,
       teach:
@@ -37,6 +39,8 @@ export default {
     },
     {
       id: 'l3m2',
+      theory:
+        "Reverse-worded items exist to catch people who stop reading. If every question points the same way, someone can tick \"agree\" down the whole page and produce a perfect-looking score. Mixing the direction makes that pattern visible.\n\nThe cost is that the raw numbers no longer mean the same thing. On a 1\u20135 scale, agreeing strongly with \"I am no good at all\" is a 5 that means *low* self-esteem. Reversing with `6 - x` puts every item back on the same footing, so higher always means more.\n\nForget this step and nothing breaks. No error, no warning. You just get a scale whose items disagree with each other, a reliability figure in the floor, and a null result you cannot explain. It is probably the single most common analysis error in undergraduate psychology.",
       title: 'Reverse-scored items',
       xp: 45,
       teach:
@@ -68,6 +72,8 @@ export default {
     },
     {
       id: 'l3m3',
+      theory:
+        "The question that decides which verb you want is: *how many rows should come out?*\n\n`mutate()` keeps the shape \u2014 120 rows in, 120 rows out, with a new column. `summarise()` collapses it \u2014 many rows in, one row out. Everything else in dplyr is a variation on those two.\n\nOnce you can see that shape change coming, most \"why did I get 120 rows when I wanted one\" confusion disappears.",
       title: 'Squash it to one row',
       xp: 45,
       teach:
@@ -96,6 +102,8 @@ export default {
     },
     {
       id: 'l3m4',
+      theory:
+        "`group_by()` computes nothing. It attaches a note to the data frame saying \"treat these as separate piles from here on\", and the *next* verb behaves differently because of it.\n\nThe pattern has a name \u2014 split, apply, combine \u2014 and it is everywhere in data work: break the data into groups, do the same thing to each, stack the answers back up.\n\nThe classic bug is forgetting the grouping is still attached. `summarise()` peels off one level of grouping and leaves the rest, so a later `mutate()` can quietly operate per-group when you meant it to operate on everything. `.by =` avoids this entirely by grouping for exactly one operation, which is why it is worth the new habit.",
       title: 'One row per group',
       xp: 50,
       teach:
@@ -131,6 +139,8 @@ export default {
     },
     {
       id: 'l3m5',
+      theory:
+        "Counting a column is the cheapest data check there is, and the one most often skipped.\n\nYou are not really after the counts. You are asking: are the categories what I think they are? Three conditions should give three labels. If it gives twelve, you have just saved yourself from an analysis that would have silently treated `\"Control\"` and `\"control \"` as different experimental groups and reported the result with a straight face.\n\nRun `count()` on every grouping variable before you trust it, every time. It costs one line and it has caught more errors than any clever technique.",
       title: 'Count things',
       xp: 40,
       teach:
@@ -167,6 +177,8 @@ export default {
     },
     {
       id: 'l3boss',
+      theory:
+        "R is column-oriented. Nearly everything is a vertical operation down a column, which is why `across()` exists: it says \"do this same thing to each of these columns\", and replaces ten copy-pasted lines.\n\nThat matters beyond convenience. Ten hand-written lines are ten chances for a typo, and a typo that reverse-scores `ses3` twice will not error. One `across()` either works for all ten or fails for all ten.\n\n`rowSums()` is the rarer sideways operation, going across a row. For a scale score that is exactly right: a person's total is a fact about that person, not about the column. Note too that leaving `na.rm` off means anyone who skipped an item gets `NA` instead of an artificially low total \u2014 a deliberate choice, not an oversight.",
       title: 'Boss: score the scale',
       boss: true,
       xp: 140,

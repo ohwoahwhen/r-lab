@@ -5,6 +5,7 @@ import { drawImages } from '../plot.js';
 import { runCode, gradeAnswer, renderPlot, peekData, shapeData, ensureStatsPackages, statsReady } from '../../r/engine.js';
 import {
   completeMission, countTry, hintsUsed, isDone, useHint, HINT_COSTS, missionRecord,
+  theoryOpen, setTheoryOpen,
 } from '../../game/state.js';
 
 const peekCache = new Map();
@@ -44,7 +45,7 @@ export function renderMission(root, { go, missionId }) {
             ${mdp(mission.teach)}
           </div>
           ${mission.theory ? `
-          <details class="card card--theory" open>
+          <details class="card card--theory" id="theory" ${theoryOpen() ? 'open' : ''}>
             <summary class="card__label card__label--toggle">The idea <span class="chev">▾</span></summary>
             <div class="theory__body">${paras(mission.theory)}</div>
           </details>` : ''}
@@ -102,6 +103,8 @@ export function renderMission(root, { go, missionId }) {
 
   $('#back').addEventListener('click', () => go('level', { levelId: level.id }));
   $('#shortcuts').addEventListener('click', showShortcuts);
+  const theoryEl = $('#theory');
+  if (theoryEl) theoryEl.addEventListener('toggle', () => setTheoryOpen(theoryEl.open));
   $('#reset-code').addEventListener('click', () => {
     editor.value = mission.starter || '';
     draftCache.set(mission.id, editor.value);

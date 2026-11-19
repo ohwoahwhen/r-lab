@@ -6,6 +6,7 @@
 
 const KEY = 'rlab.save.v1';
 const THEME_KEY = 'rlab.theme';
+const THEORY_KEY = 'rlab.theory.open';
 
 export const RANKS = [
   { at: 0,    name: 'Volunteer RA' },
@@ -226,3 +227,14 @@ export function loadTheme() {
 }
 
 export function saveTheme(t) { safeSet(THEME_KEY, t); }
+
+/* ───────── "The idea" card ───────── */
+
+/** Open by default; collapsing it once keeps it collapsed. */
+export function theoryOpen() {
+  return safeGet(THEORY_KEY) !== '0';
+}
+
+export function setTheoryOpen(open) {
+  safeSet(THEORY_KEY, open ? '1' : '0');
+}

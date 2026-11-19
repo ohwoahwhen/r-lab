@@ -19,9 +19,11 @@ from the webR package repository on first visit and cached by your browser after
   aesthetic mappings, facets, scales and labels, so the feedback can say *what* is different
   rather than "wrong".
 - **Specific feedback.** Three hints per mission, revealed one at a time for a little XP.
-- **Theory, not just syntax.** Every mission in the statistics levels opens with *The idea* —
-  what the number actually means, why the convention exists, and the mistake it is there to
-  prevent. Collapse it if you already know.
+- **Theory, not just syntax.** Every mission opens with *The idea* — the concept under the
+  code, why the convention exists, and the mistake it is there to prevent. Why `filter()`
+  silently drops `NA` rows. Why reverse-scoring failures produce no error at all. Why
+  truncating a y-axis is the easiest way to mislead with a true chart. Why overlapping error
+  bars do not mean "not significant". Collapse the card once and it stays collapsed.
 - **RStudio's keyboard shortcuts**, so the habits transfer both ways: `Alt+-` for `<-`,
   `Cmd/Ctrl+Shift+M` for the pipe, `Cmd/Ctrl+Shift+C` to comment, `Cmd/Ctrl+Enter` to run the
   selection, and the rest. The full list is in Settings, or the ⌨ button above the editor.

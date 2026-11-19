@@ -174,11 +174,15 @@ a conference deadline, a reviewer who wants effect sizes).
 
 ### Teaching, not just syntax
 
-Every mission in levels 7–9 carries a `theory` field, rendered as a collapsible **The idea**
+Every one of the 61 missions carries a `theory` field, rendered as a collapsible **The idea**
 card above the task. It is deliberately not a restatement of the `teach` line: `teach` says
-what to type, `theory` says what the number means, why the convention exists, and which
-mistake it exists to prevent. Three short paragraphs is the target; it collapses for anyone
-who already knows.
+what to type, `theory` says what the idea *is*, why the convention exists, and which mistake
+it exists to prevent. Around 110 words each; the card remembers whether the reader collapsed it.
+
+The early levels need this as much as the statistics ones, because that is where the silent
+failure modes live — `filter()` dropping `NA` rows without a warning, a vector coercing to
+character the moment one word lands in it, reverse-scoring errors that produce no error at all,
+`scale_y_continuous(limits = ...)` deleting data before a summary layer sees it.
 
 ### Editor shortcuts
 

@@ -30,8 +30,9 @@ Live: https://ohwoahwhen.github.io/r-lab/ · Plan: [PLAN.md](PLAN.md)
 ## Stage 3 — level 9 + teaching layer — DONE (19 Nov 2026)
 - [x] Level 9 Lines Through Clouds — `lm`, `summary`, `predict`, multiple predictors,
       nested model comparison, dummy coding, moderation, APA regression boss
-- [x] `theory` field on every mission in levels 7–9, rendered as a collapsible
-      "The idea" card: what the number means, why the convention exists, the mistake it prevents
+- [x] `theory` field on **every one of the 61 missions**, rendered as a collapsible
+      "The idea" card: the concept under the code, why the convention exists, the mistake it
+      prevents. The card remembers whether you collapsed it.
 - [x] RStudio keymap in the editor (`Alt+-`, `Cmd/Ctrl+Shift+M`, `Cmd/Ctrl+Shift+C`,
       `Cmd/Ctrl+D`, `Alt+↑/↓`, `Ctrl+L`, `Cmd/Ctrl+F`, selection-aware `Cmd/Ctrl+Enter`),
       a ⌨ panel above the editor and a reference table in Settings
@@ -41,7 +42,6 @@ Live: https://ohwoahwhen.github.io/r-lab/ · Plan: [PLAN.md](PLAN.md)
 
 ## Backlog
 - [ ] Level 10 mixed models (lme4 2.0-6 is available as wasm)
-- [ ] Theory cards for levels 1–6 as well, if the stats ones land well
 - [ ] Free-play console screen with all datasets loaded
 - [ ] Error-aware hints: match common R error text → targeted advice
       (e.g. "could not find function" → "did you forget the library, or misspell it?")
@@ -70,8 +70,9 @@ Live: https://ohwoahwhen.github.io/r-lab/ · Plan: [PLAN.md](PLAN.md)
 3. Mission shape and checker helpers are in PLAN.md §3. A checker is R code whose value is
    a character vector of problems; empty means pass. Compute the expected answer from the
    data inside the checker rather than hard-coding numbers, so it can never drift.
-   For a statistics mission, add a `theory` field too — `teach` says what to type, `theory`
-   says what it means and why. Three short paragraphs, not a textbook.
+   Add a `theory` field as well — `teach` says what to type, `theory` says what the idea is,
+   why the convention exists and which mistake it prevents. Around 110 words, three short
+   paragraphs, not a textbook. Every existing mission has one; keep that true.
 4. New data goes in `src/r/datasets.R` with its own `set.seed`, and into `rlab_build_data()`.
    Anything derived from the messy originals belongs in `rlab_make_derived()`.
 5. Add two or three plausible wrong answers per mission to `src/test/wrong.js`, each with a

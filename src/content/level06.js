@@ -11,6 +11,8 @@ export default {
   missions: [
     {
       id: 'l6m1',
+      theory:
+        "Faceting makes **small multiples**: the same plot, repeated across groups, on shared axes. Tufte's argument for them is that once a reader learns how to read one panel, every other panel is free.\n\nThe shared axes are the point. Comparison across panels is honest because nothing moved. The moment each panel gets its own scale, differences between panels stop being readable, which is why `scales = \"free\"` should be a deliberate choice rather than a reflex.\n\nThe alternative \u2014 four groups overplotted in one panel in four colours \u2014 is usually worse. Colour is a weak channel for comparing shapes, and overlap hides exactly the dense regions you most want to see.",
       title: 'Small multiples',
       xp: 50,
       teach:
@@ -37,6 +39,8 @@ export default {
     },
     {
       id: 'l6m2',
+      theory:
+        "`facet_wrap()` takes one variable and flows the panels like text. `facet_grid()` crosses two, so a panel's position tells you its values: read along a row to hold sex constant, down a column to hold drug constant.\n\nThat positional meaning is the reason to pay for the extra ink. A grid makes a two-way design visible as a shape, and an interaction in a two-by-two grid is something you can often see before you test it.\n\nUse wrap when panels are just a list. Use grid when the crossing itself is the structure you want read.",
       title: 'A grid of panels',
       xp: 55,
       teach:
@@ -81,6 +85,8 @@ export default {
     },
     {
       id: 'l6m3',
+      theory:
+        "Axis limits are an editorial decision and they are the easiest way to mislead with a true chart. Truncating a y-axis magnifies a trivial difference into a dramatic one; the technique is so reliable that news graphics departments use it on purpose.\n\nThe honest default depends on the measure. Bar charts encode value by length, so they need to start at zero or the lengths lie. Line charts of temperature or IQ do not, because zero is not a meaningful anchor there.\n\nOne trap specific to ggplot: `scale_*_continuous(limits = ...)` **removes** data outside the range before anything is computed, which can change a trend line or a boxplot. `coord_cartesian(ylim = ...)` zooms instead, keeping all the data. If setting limits changed your summary layer, that is why.",
       title: 'Take control of an axis',
       xp: 55,
       teach:
@@ -112,6 +118,8 @@ export default {
     },
     {
       id: 'l6m4',
+      theory:
+        "Colour is a data encoding, not decoration, and it has a budget. Most people can reliably track about six or seven categorical colours at once; beyond that a legend becomes a lookup table and the reader gives up.\n\nChoosing your own serves two purposes. It lets colour carry meaning \u2014 red for the cue that predicts something, grey for the one that does not \u2014 and it lets you pick a palette that survives colour vision deficiency and greyscale printing.\n\nNaming values by level, rather than giving a bare list, is a correctness issue rather than a style one. An unnamed list is matched in factor order, so the day someone reorders a factor, your colours swap and your figure now says the opposite thing, silently.",
       title: 'Colours you chose',
       xp: 55,
       teach:
@@ -148,6 +156,8 @@ export default {
     },
     {
       id: 'l6m5',
+      theory:
+        "A theme controls everything that is not data: fonts, gridlines, background, legend position. That separation is the useful part \u2014 you can restyle a figure for a thesis, a slide and a poster without touching the analysis.\n\nOrder matters because a complete theme like `theme_minimal()` replaces every setting at once. Put it after your `theme()` tweaks and it overwrites them. Complete theme first, adjustments second.\n\nMost defaults exist to be changed. The grey panel ggplot ships with was chosen so that light-coloured points stay visible; if your points are dark, it is just ink. And legends on the right steal horizontal space from the data, which is why moving them to the bottom often makes a figure breathe.",
       title: 'Dress it down',
       xp: 50,
       teach:
@@ -188,6 +198,8 @@ export default {
     },
     {
       id: 'l6m6',
+      theory:
+        "Half the work of a figure is telling the reader where to look. A suppression ratio of 0.5 means the cue changed nothing \u2014 that is the line everything is measured against, so drawing it saves the reader doing arithmetic in their head.\n\nAnnotation is also where authorship shows. A plot that marks the baseline, labels the interesting region and names the comparison is an argument. One that leaves the reader to infer all of that is a data dump.\n\n`annotate()` and `geom_text()` differ in a way worth knowing. `geom_text()` draws once per row of your data, so a label on a 500-row dataset gets drawn 500 times in the same place \u2014 which is why it looks oddly bold or blurry. `annotate()` draws once.",
       title: 'Point at the thing that matters',
       xp: 55,
       teach:
@@ -232,6 +244,8 @@ export default {
     },
     {
       id: 'l6boss',
+      theory:
+        "Error bars are the most misread element in psychology figures, because they can be three different things and the picture gives no clue which.\n\nStandard deviation describes the spread of the data. Standard error describes the uncertainty of the mean, and is always smaller. A 95% confidence interval is about twice the standard error. Choosing the smallest one makes your result look most precise, which is exactly why the caption must say which you used.\n\nAnd the thing almost everyone gets wrong: overlapping error bars do not mean \"not significant\". Two means with overlapping standard-error bars can differ significantly; non-overlapping 95% intervals usually do, but it is a rule of thumb, not a test. Bars show uncertainty. They do not perform the comparison for you.",
       title: 'Boss: the figure for the paper',
       boss: true,
       kind: 'plot',
