@@ -880,3 +880,114 @@ rlab_want_model_comparison <- function(x, want) {
     rlab_want_value(x[["Pr(>F)"]][2], want[["Pr(>F)"]][2], "the p value for the comparison", tol = 1e-6)
   )
 }
+
+# ── level 10: mixed-effects models ───────────────────────────────────
+
+rlab_is_mer <- function(x) inherits(x, "merMod") || inherits(x, "lmerMod") ||
+  inherits(x, "lmerModLmerTest")
+
+rlab_want_mer <- function(x, what = "the model from `lmer()`") {
+  if (inherits(x, "summary.merMod") || inherits(x, "summary.lmerModLmerTest"))
+    return("That is the summary of the model. This mission wants the model object itself, so leave `summary()` off.")
+  if (inherits(x, "lm") && !rlab_is_mer(x))
+    return("That is an ordinary `lm()`. A mixed model needs `lmer()` and a random-effects term like `(1 | pid)`.")
+  if (!rlab_is_mer(x))
+    return(sprintf("Your answer should be %s, but it is %s. %s", what, rlab_desc(x),
+                   rlab_hint_lastline()))
+  character(0)
+}
+
+rlab_mer_fixef <- function(x) {
+  if (inherits(x, "summary.merMod") || inherits(x, "summary.lmerModLmerTest"))
+    return(x$coefficients[, "Estimate"])
+  tryCatch(lme4::fixef(x), error = function(e) NULL)
+}
+
+rlab_want_fixef <- function(x, name, value, tol = 1e-3) {
+  fe <- rlab_mer_fixef(x)
+  if (is.null(fe)) return(character(0))
+  if (!name %in% names(fe))
+    return(sprintf("There is no `%s` fixed effect in your model. It has: %s.", name,
+                   paste0("`", names(fe), "`", collapse = ", ")))
+  rlab_want_value(unname(fe[[name]]), value, sprintf("the fixed effect for `%s`", name), tol = tol)
+}
+
+rlab_vc <- function(x) {
+  m <- if (inherits(x, "summary.merMod") || inherits(x, "summary.lmerModLmerTest")) NULL else x
+  if (is.null(m)) return(NULL)
+  tryCatch(as.data.frame(lme4::VarCorr(m)), error = function(e) NULL)
+}
+
+# The random-effects structure, as a readable string like "pid: intercept + condition".
+rlab_random_terms <- function(x) {
+  vc <- rlab_vc(x)
+  if (is.null(vc)) return(character(0))
+  keep <- vc[is.na(vc$var2) & vc$grp != "Residual", , drop = FALSE]
+  if (!nrow(keep)) return(character(0))
+  paste0(keep$grp, ": ", keep$var1)
+}
+
+rlab_want_random <- function(x, terms) {
+  if (!rlab_is_mer(x)) return(character(0))
+  got <- rlab_random_terms(x)
+  miss <- setdiff(terms, got)
+  extra <- setdiff(got, terms)
+  out <- character(0)
+  if (length(miss))
+    out <- c(out, sprintf("The random-effects part is missing %s. Yours has: %s.",
+                          paste0("`", miss, "`", collapse = ", "),
+                          if (length(got)) paste0("`", got, "`", collapse = ", ") else "nothing"))
+  if (length(extra) && !length(miss))
+    out <- c(out, sprintf("The random-effects part has %s, which I didn't ask for.",
+                          paste0("`", extra, "`", collapse = ", ")))
+  out
+}
+
+rlab_vc_sd <- function(x, grp, var1) {
+  vc <- rlab_vc(x)
+  if (is.null(vc)) return(NULL)
+  i <- which(vc$grp == grp & !is.na(vc$var1) & vc$var1 == var1 & is.na(vc$var2))
+  if (!length(i)) return(NULL)
+  vc$sdcor[i[1]]
+}
+
+rlab_want_vc_sd <- function(x, grp, var1, value, label, tol = 1e-2) {
+  got <- rlab_vc_sd(x, grp, var1)
+  if (is.null(got))
+    return(sprintf("I couldn't find the %s in your model's random effects.", label))
+  rlab_want_value(got, value, label, tol = tol)
+}
+
+rlab_mer_coeftab <- function(x) {
+  if (inherits(x, "summary.merMod") || inherits(x, "summary.lmerModLmerTest"))
+    return(x$coefficients)
+  tryCatch(summary(x)$coefficients, error = function(e) NULL)
+}
+
+rlab_want_satterthwaite <- function(x) {
+  tab <- rlab_mer_coeftab(x)
+  if (is.null(tab)) return(character(0))
+  if (!("Pr(>|t|)" %in% colnames(tab)))
+    return(paste0("Your coefficient table has no p values (its columns are ",
+                  paste0("`", colnames(tab), "`", collapse = ", "),
+                  "). That is plain lme4. Load lmerTest and refit so the Satterthwaite ",
+                  "degrees of freedom and p values appear."))
+  character(0)
+}
+
+# anova() on two merMods is a likelihood ratio test, not an F test.
+rlab_want_lrt <- function(x, want) {
+  if (!is.data.frame(x))
+    return(sprintf("Your answer should be the result of `anova()` comparing two models, but it is %s. %s",
+                   rlab_desc(x), rlab_hint_lastline()))
+  if (nrow(x) < 2)
+    return("That table has one row, so only one model went into it. Pass both: `anova(m1, m2)`.")
+  if (!("Chisq" %in% names(x)))
+    return(sprintf("I can't find a Chisq column. Comparing two mixed models gives a likelihood ratio test; your table has: %s.",
+                   paste0("`", names(x), "`", collapse = ", ")))
+  rlab_seq(
+    rlab_want_value(x[["Df"]][2], want[["Df"]][2], "the degrees of freedom for the comparison"),
+    rlab_want_value(x[["Chisq"]][2], want[["Chisq"]][2], "the chi-square for the comparison", tol = 1e-2),
+    rlab_want_value(x[["Pr(>Chisq)"]][2], want[["Pr(>Chisq)"]][2], "the p value for the comparison", tol = 1e-8)
+  )
+}

@@ -44,10 +44,11 @@ from the webR package repository on first visit and cached by your browser after
 | 7 | Numbers That Mean Something | descriptives, Cronbach's alpha, t-tests, correlations, Cohen's d, APA reporting |
 | 8 | The Analysis | one-way ANOVA, eta squared, Levene's test, `emmeans` post-hocs, mixed ANOVA with `afex`, simple effects |
 | 9 | Lines Through Clouds | regression, prediction, control variables, model comparison, dummy coding, moderation |
+| 10 | Everyone Is Different | mixed-effects models: random intercepts, ICC, Satterthwaite p values, random slopes, individual differences |
 
-61 missions in all, including nine boss challenges and two recreate-the-chart tasks.
-Levels 7, 8 and 9 fetch `effectsize`, `psych`, `car`, `afex` and `emmeans` the first time you
-open one — about 20 MB that the earlier levels never download.
+68 missions in all, including ten boss challenges and two recreate-the-chart tasks.
+Levels 7 to 10 fetch `effectsize`, `psych`, `car`, `afex`, `emmeans`, `lme4` and `lmerTest`
+the first time you open one — about 20 MB that the earlier levels never download.
 
 The datasets are simulated but deliberately messy — typo'd category labels, missing values,
 wide formats, numbers stored as text — because that is what real data looks like. Levels 6–8

@@ -7,6 +7,7 @@ options(
   digits = 7,
   warn = 1,
   cli.num_colors = 1,         # no ANSI escapes in the output pane
+  lmerTest.limit = 10000,     # let Satterthwaite df be computed on trial-level data
   cli.unicode = FALSE,
   crayon.enabled = FALSE,
   pillar.bold = FALSE,

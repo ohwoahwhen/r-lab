@@ -40,8 +40,20 @@ Live: https://ohwoahwhen.github.io/r-lab/ · Plan: [PLAN.md](PLAN.md)
       instead of 141 — with format v1 still readable on import
 - [x] All 61 missions replayed: 0 failed, 0 weak hints
 
+## Stage 4 — level 10 — DONE (19 Nov 2026)
+- [x] Level 10 Everyone Is Different — `lmer`, variance components and ICC, why lme4 omits
+      p values and what lmerTest's Satterthwaite df mean, random slopes, likelihood ratio
+      tests, per-participant effects from `coef()`, APA mixed-model boss
+- [x] `lme4` and `lmerTest` added to the lazily-installed statistics set (~1 s extra, since
+      Matrix and nlme already arrive with afex and car)
+- [x] `rt_task` regenerated so each participant has their own congruency effect as well as
+      their own baseline speed. Without it the random slopes were unidentifiable and the
+      level had nothing to teach; individual effects now span −29 ms to +97 ms
+- [x] All 68 missions replayed after the data change: 0 failed, 0 weak hints
+
 ## Backlog
-- [ ] Level 10 mixed models (lme4 2.0-6 is available as wasm)
+- [ ] Level 11: generalised mixed models — `glmer` on the trial-level `correct` column,
+      which is already in `rt_task` and currently unused
 - [ ] Free-play console screen with all datasets loaded
 - [ ] Error-aware hints: match common R error text → targeted advice
       (e.g. "could not find function" → "did you forget the library, or misspell it?")
@@ -52,10 +64,14 @@ Live: https://ohwoahwhen.github.io/r-lab/ · Plan: [PLAN.md](PLAN.md)
 - [ ] Pre-warm the statistics packages in the background once level 6 is reached,
       so level 7 opens with no wait
 - [ ] Let the shortcuts be remapped, for anyone who does not come from RStudio
+- [ ] A "model zoo" summary screen: the same question answered by t-test, ANOVA, regression
+      and a mixed model, side by side
 
 ## Known rough edges
 - The statistics packages are re-downloaded into webR's virtual filesystem on every page
   load (the HTTP cache makes it quick, but it is not instant). A PWA cache would fix it.
+- Mixed models take about a second to fit in WebAssembly, so levels 10 missions feel
+  slightly slower to submit than the rest. That is honest work, not a bug.
 - There is no base-R fallback for levels 7–8 if afex/emmeans fail to install. They were
   verified working; if that ever changes, the loader says so plainly instead of pretending.
 - `rlab_want_nums()` compares the numbers in an APA sentence positionally, so a student who

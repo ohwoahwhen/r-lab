@@ -41,7 +41,15 @@ Non-goals: no account system, no server, no analytics, no paid services.
 
 Core (eager): `dplyr 1.2.1`, `tidyr 1.3.2`, `ggplot2 4.0.3`, `readr 2.2.0`, `stringr 1.6.0`,
 `forcats 1.0.1`, `tibble`, `purrr`.
-Stats (lazy, level 7–8): `effectsize 1.0.3`, `psych 2.6.9`, `afex 1.5-1`, `emmeans 2.0.4`, `car 3.1-5`.
+Stats (lazy, levels 7–10): `effectsize 1.0.3`, `psych 2.6.9`, `afex 1.5-1`, `emmeans 2.0.4`,
+`car 3.1-5`, `lme4 2.0-6`, `lmerTest 3.2-1`.
+
+Mixed models are fast enough in WebAssembly to be interactive: on 6,587 trials a random-intercept
+fit takes ~0.55 s, random slopes ~1.3 s, and a likelihood ratio test ~0.7 s.
+
+> `lme4::lmer()` with the namespace prefix bypasses lmerTest, so the summary loses its `df` and
+> `Pr(>|t|)` columns. Level 10's checkers must call `lmerTest::lmer()` to match what the student,
+> who types a bare `lmer()`, actually gets. This bit the first draft of those checkers.
 
 Both `afex` and `emmeans` exist as wasm builds and were verified end to end in the browser:
 a 2×2 mixed ANOVA, a 2×2×8 three-way, `emmeans` simple effects and `effectsize` all run. The
@@ -169,8 +177,9 @@ a conference deadline, a reviewer who wants effect sizes).
 | 7 | Numbers That Mean Something | descriptives, Cronbach's alpha, `t.test`, `cor.test`, Cohen's d, APA strings | `wellbeing_scored` | Full APA results sentence |
 | 8 | The Analysis | `aov`, eta squared, Levene, `emmeans`, `afex` mixed ANOVA, simple effects | `wellbeing_scored`, `pavlov_long` | Interaction reported in APA words |
 | 9 | Lines Through Clouds | `lm`, `predict`, control variables, `anova()` model comparison, dummy coding, moderation | `hikes_clean`, `wellbeing_scored` | Regression reported in APA words |
+| 10 | Everyone Is Different | `lmer`, variance components and ICC, Satterthwaite p values, random slopes, likelihood ratio tests, `coef()` per participant | `rt_clean` | Mixed model reported in APA words |
 
-5–7 missions + 1 boss per level, **61 challenges** in total.
+5–7 missions + 1 boss per level, **68 challenges** in total.
 
 ### Teaching, not just syntax
 
@@ -221,6 +230,12 @@ settings page and the ⌨ panel render from it.
 8. Playtest every challenge in a real browser; fix.
 9. Repo + Pages deploy; verify live link on desktop and phone widths.
 
+**Stage 4 — level 10 — done**
+15. Mixed-effects models on the trial-level reaction-time data.
+16. `rt_task` regenerated so each participant has their own congruency effect as well as their
+    own baseline speed — without it the random slopes were not identifiable and the level had
+    no lesson. Individual effects now run from −29 ms to +97 ms.
+
 **Stage 3 — level 9 — done**
 13. Regression: `lm`, `summary`, `predict`, multiple predictors, nested model comparison,
     dummy coding, moderation, and an APA regression sentence.
@@ -232,7 +247,7 @@ settings page and the ⌨ panel render from it.
 12. Playtest; deploy.
 
 **Later (TODO.md keeps these)**
-Level 10+ (mixed models), a sandbox console with all datasets, mission search,
+Level 11+ (generalised mixed models for accuracy data), a sandbox console, mission search,
 "explain my error" hints keyed to R error text, keyboard-only play, PWA offline cache.
 
 ### APA string grading

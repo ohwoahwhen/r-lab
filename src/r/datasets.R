@@ -79,8 +79,13 @@ rlab_make_rt <- function() {
                       trial = 1:30, stringsAsFactors = FALSE)
   grid <- grid[order(grid$pid, grid$block, grid$trial), ]
   n <- nrow(grid)
+  # Each person has their own overall speed AND their own susceptibility to
+  # interference. Both are real, and together they are what a mixed model with
+  # random intercepts and random slopes is for.
   pskill <- setNames(rnorm(40, 0, 45), pids)
-  base <- 470 + pskill[grid$pid] + ifelse(grid$condition == "incongruent", 58, 0) -
+  peffect <- setNames(rnorm(40, 0, 24), pids)
+  base <- 470 + pskill[grid$pid] +
+    ifelse(grid$condition == "incongruent", 58 + peffect[grid$pid], 0) -
     (grid$block - 1) * 11
   rt <- round(base + rgamma(n, 2, 0.02) - 60)
   rt[rt < 180] <- round(runif(sum(rt < 180), 190, 260))

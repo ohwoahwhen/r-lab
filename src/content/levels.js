@@ -15,8 +15,9 @@ import l6 from './level06.js';
 import l7 from './level07.js';
 import l8 from './level08.js';
 import l9 from './level09.js';
+import l10 from './level10.js';
 
-export const LEVELS = [l1, l2, l3, l4, l5, l6, l7, l8, l9];
+export const LEVELS = [l1, l2, l3, l4, l5, l6, l7, l8, l9, l10];
 
 /** Levels that are planned but not written yet, shown greyed on the map. */
 export const COMING_SOON = [];
