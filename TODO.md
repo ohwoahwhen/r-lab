@@ -92,6 +92,20 @@ Live: https://ohwoahwhen.github.io/r-lab/ · Plan: [PLAN.md](PLAN.md)
       in `d`, so a probe asserting that the signed value was wrong had to go
 - [x] All 90 missions replayed: 0 failed, 0 weak hints
 
+## Stage 8 — level 14 — DONE (20 Nov 2026)
+- [x] Level 14 Your Own Data — `list.files` and paths, `read_csv` and its type guessing,
+      `na =` for junk missing codes, `comment =` for preambles, writing your own function,
+      reading a folder with `map()` + `list_rbind()`, `write_csv` round trip, and a boss that
+      is a broken script with three realistic bugs to find
+- [x] `rlab_make_files()` seeds `lab/` at boot with awkward exports and a readme
+- [x] Settings → *Your own data*: add a CSV from your machine and read it with
+      `read_csv("lab/...")`. Never leaves the tab, and the UI says so
+- [x] Fixed: `purrr` was installed but never attached, so `map()` and `list_rbind()` did not
+      exist for any mission answer
+- [x] Missions can declare a `setup` snippet run before the answer, so a mission that writes a
+      file cannot be passed by an answer that writes nothing
+- [x] All 98 missions replayed: 0 failed, 0 weak hints
+
 ## Backlog
 - [ ] Still not covered anywhere: chi-square and contingency tables, bootstrapping,
       Bayes factors, mediation, meta-analytic thinking, multiple imputation for missing data
@@ -131,7 +145,10 @@ Live: https://ohwoahwhen.github.io/r-lab/ · Plan: [PLAN.md](PLAN.md)
    why the convention exists and which mistake it prevents. Around 110 words, three short
    paragraphs, not a textbook. Every existing mission has one; keep that true.
 4. New data goes in `src/r/datasets.R` with its own `set.seed`, and into `rlab_build_data()`.
-   Anything derived from the messy originals belongs in `rlab_make_derived()`.
+   Anything derived from the messy originals belongs in `rlab_make_derived()`, and files on
+   the virtual filesystem in `rlab_make_files()`.
+   If an answer creates or changes state (a file, a global option), give the mission a `setup`
+   snippet that resets it, or a second attempt can pass on the first one's leftovers.
 5. Add two or three plausible wrong answers per mission to `src/test/wrong.js`, each with a
    regex for what the feedback must mention.
 6. `npm run dev`, open `/test.html` (or `/test.html?only=l9` for one level) and confirm

@@ -35,7 +35,7 @@ rlab_load <- function(pkgs) {
 }
 
 rlab_version_report <- function() {
-  pkgs <- c("dplyr", "tidyr", "ggplot2", "readr", "stringr", "forcats", "tibble")
+  pkgs <- c("dplyr", "tidyr", "ggplot2", "readr", "stringr", "forcats", "purrr", "tibble")
   have <- vapply(pkgs, function(p)
     tryCatch(as.character(utils::packageVersion(p)), error = function(e) "-"),
     character(1))

@@ -27,9 +27,8 @@ setProgressHandler((stage, pct, detail) => {
   document.getElementById('status').textContent = `${stage} ${Math.round(pct)}% — ${detail || ''}`;
 });
 
-async function attempt(code) {
-  const r = await runCode(code);
-  return r;
+async function attempt(code, setup) {
+  return runCode(code, { setup });
 }
 
 async function main() {
@@ -56,7 +55,7 @@ async function main() {
     for (const m of level.missions) {
       if (only && !m.id.startsWith(only)) continue;
       // 1. the model solution must pass
-      const run = await attempt(m.solution);
+      const run = await attempt(m.solution, m.setup);
       if (run.status !== 'ok') {
         results.fail.push({ id: m.id, why: 'solution errored', detail: run.message || run.text });
         log(`FAIL ${m.id} — solution errored: ${run.message}`, 'bad');
@@ -78,7 +77,7 @@ async function main() {
 
       // 2. wrong answers must fail, with feedback that names the problem
       for (const [bad, mustMention] of (WRONG[m.id] || [])) {
-        const br = await attempt(bad);
+        const br = await attempt(bad, m.setup);
         let probs = [];
         let passed = false;
         if (br.status !== 'ok') {

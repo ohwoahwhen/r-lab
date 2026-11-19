@@ -1,5 +1,6 @@
 import { THEMES, getTheme, setTheme } from '../theme.js';
 import { SHORTCUTS } from '../editor.js';
+import { putFile, labFiles, LAB_DIR } from '../../r/engine.js';
 import { esc, toast, modal, confirmBox } from '../dom.js';
 import { LEVELS, missionOrder } from '../../content/levels.js';
 import {
@@ -51,6 +52,18 @@ export function renderSettings(root, { go, onThemeChange }) {
           </tr>`).join('')}
       </table>
 
+      <h2>Your own data</h2>
+      <p class="muted">R Lab runs R inside this tab, so a file you add here goes from your disk into
+      this page and <strong>nowhere else</strong> — there is no server to send it to. It sits in
+      <code>lab/</code> until you close the tab, and you read it the way you would read any file:
+      <code>read_csv("lab/your-file.csv")</code>.</p>
+      <div class="row">
+        <label class="btn btn--sm" for="pick-file">Add a CSV…</label>
+        <input type="file" id="pick-file" accept=".csv,.tsv,.txt" multiple hidden />
+        <span class="muted" id="file-note"></span>
+      </div>
+      <table class="shortcuts" id="file-list"></table>
+
       <h2>Move your progress to another device</h2>
       <p class="muted">Your save code holds your XP, streak and every mission you have passed. Copy it on this
       device, paste it on the other one. It is just text — email it to yourself, put it in a note, whatever.</p>
@@ -88,6 +101,42 @@ export function renderSettings(root, { go, onThemeChange }) {
       });
       if (onThemeChange) onThemeChange();
     });
+  });
+
+  async function drawFiles() {
+    const host = $('#file-list');
+    if (!host) return;
+    try {
+      const files = await labFiles();
+      host.innerHTML = files.length
+        ? files.map((f) => `<tr><td><code>lab/${esc(f.name)}</code></td><td class="muted">${(f.size / 1024).toFixed(1)} KB</td></tr>`).join('')
+        : '<tr><td class="muted">No files yet.</td></tr>';
+    } catch {
+      host.innerHTML = '<tr><td class="muted">Could not read the lab folder.</td></tr>';
+    }
+  }
+  drawFiles();
+
+  $('#pick-file').addEventListener('change', async (e) => {
+    const chosen = [...(e.target.files || [])];
+    if (!chosen.length) return;
+    const note = $('#file-note');
+    note.textContent = 'Adding…';
+    const added = [];
+    for (const file of chosen) {
+      try {
+        const bytes = new Uint8Array(await file.arrayBuffer());
+        added.push(await putFile(file.name, bytes));
+      } catch (err) {
+        toast(`Could not add ${file.name}: ${err && err.message ? err.message : err}`, 'bad', 5000);
+      }
+    }
+    e.target.value = '';
+    note.textContent = added.length
+      ? `Added ${added.map((n) => `lab/${n}`).join(', ')}`
+      : '';
+    if (added.length) toast(`Read it with read_csv("lab/${added[0]}")`, 'good', 4200);
+    drawFiles();
   });
 
   $('#copy').addEventListener('click', async () => {

@@ -14,7 +14,7 @@ import gradeR from './grade.R?raw';
 const WEBR_VERSION = '0.6.1';
 const WEBR_URL = `https://webr.r-wasm.org/v${WEBR_VERSION}/webr.mjs`;
 
-export const CORE_PACKAGES = ['dplyr', 'tidyr', 'ggplot2', 'readr', 'stringr', 'forcats'];
+export const CORE_PACKAGES = ['dplyr', 'tidyr', 'ggplot2', 'readr', 'stringr', 'forcats', 'purrr'];
 export const STATS_PACKAGES = ['effectsize', 'psych', 'car', 'afex', 'emmeans', 'lme4', 'lmerTest', 'pwr', 'TOSTER'];
 
 const PLOT = { width: 680, height: 440 };
@@ -152,8 +152,17 @@ export async function bindCode(name, text) {
  * Run the student's code. Returns console text, any error, and plot images.
  * @param {string} code
  */
-export async function runCode(code, { plot = true } = {}) {
+export async function runCode(code, { plot = true, setup = null } = {}) {
   if (!ready) throw new Error('R is not ready yet.');
+  // A mission can ask for a clean slate first — removing a file it expects the
+  // answer to create, say — so an earlier attempt cannot make a later one pass.
+  if (setup) {
+    try {
+      await webR.evalRVoid(setup);
+    } catch (err) {
+      console.warn('mission setup failed', err);
+    }
+  }
   await bindCode('.rlab_code', code);
   const opts = plot ? { captureGraphics: { width: PLOT.width, height: PLOT.height } } : { captureGraphics: false };
   let cap;
@@ -226,4 +235,38 @@ export async function resetDatasets() {
 
 export async function evalRaw(code) {
   return evalStrings(code);
+}
+
+/* ───────── the virtual filesystem ───────── */
+
+export const LAB_DIR = '/home/web_user/lab';
+
+/**
+ * Put a file the person chose into R's filesystem so they can read it with
+ * read_csv(). webR runs entirely in this tab, so the file is never uploaded
+ * anywhere — it goes from their disk into this page's memory and no further.
+ */
+export async function putFile(name, bytes) {
+  const safe = String(name).replace(/[^A-Za-z0-9._-]/g, '_').replace(/^\.+/, '');
+  if (!safe) throw new Error('That file needs a usable name.');
+  try {
+    await webR.FS.mkdir(LAB_DIR);
+  } catch {
+    /* already exists */
+  }
+  await webR.FS.writeFile(`${LAB_DIR}/${safe}`, bytes);
+  return safe;
+}
+
+/** The files currently sitting in the lab folder, with their sizes. */
+export async function labFiles() {
+  const out = await evalStrings(
+    `{ f <- list.files("${LAB_DIR}", full.names = TRUE)
+       if (!length(f)) character(0) else
+         paste0(basename(f), "\t", file.info(f)$size) }`
+  );
+  return out.filter(Boolean).map((row) => {
+    const [name, size] = row.split('\t');
+    return { name, size: Number(size) || 0 };
+  });
 }

@@ -30,6 +30,10 @@ from the webR package repository on first visit and cached by your browser after
 - **XP, ranks, daily streak, boss challenges** at the end of each level.
 - **Save codes** move your progress between devices with no account: export a short code on
   one device, paste it on another. Importing never silently overwrites better progress.
+- **Bring your own CSV.** Settings → *Your own data* puts a file into R's filesystem, so you can
+  `read_csv("lab/your-file.csv")` and use everything you have learned on your real data. R runs
+  inside the page, so the file goes from your disk into the tab and **nowhere else** — there is
+  no server to send it to.
 
 ## Levels
 
@@ -48,8 +52,9 @@ from the webR package repository on first visit and cached by your browser after
 | 11 | The Fine Print | paired designs, planned contrasts, multiplicity corrections, unequal n and Type I/II/III, sphericity, diagnostics, rank-based tests |
 | 12 | Right or Wrong | logistic regression, odds ratios, predicted probabilities, deviance tests, generalised mixed models |
 | 13 | How Much Is Enough | power and sample size, the post-hoc power fallacy, sensitivity analysis, safeguard power, simulation, equivalence testing |
+| 14 | Your Own Data | files and paths, `read_csv` and column types, writing your own functions, many files with `map`, `write_csv`, reading an error message |
 
-90 missions in all, including thirteen boss challenges and two recreate-the-chart tasks.
+98 missions in all, including fourteen boss challenges and two recreate-the-chart tasks.
 Levels 7 to 13 fetch `effectsize`, `psych`, `car`, `afex`, `emmeans`, `lme4`, `lmerTest`, `pwr` and `TOSTER`
 the first time you open one — about 20 MB that the earlier levels never download.
 

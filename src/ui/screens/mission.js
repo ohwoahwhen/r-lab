@@ -278,7 +278,7 @@ export function renderMission(root, { go, missionId }) {
     draftCache.set(mission.id, whole);
     const selected = editor.selection();
     const code = selectionOnly && selected.trim() ? selected : whole;
-    const res = await runCode(code);
+    const res = await runCode(code, { setup: mission.setup });
     const out = $('#out');
     if (res.text && res.text.trim()) {
       out.textContent = res.text;

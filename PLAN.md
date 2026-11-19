@@ -181,8 +181,20 @@ a conference deadline, a reviewer who wants effect sizes).
 | 11 | The Fine Print | paired t and *dz*, planned `contrast()`, `p.adjust` families, Type I/II/III with unequal n, sphericity and Greenhouse–Geisser, `vif()` and residual diagnostics, `wilcox.test` | `wellbeing_scored`, `pavlov_long`, `hikes_clean` | Pre-registered primary result |
 | 12 | Right or Wrong | `glm(family = binomial)`, odds ratios, predicted probabilities, deviance and likelihood ratio tests, `glmer` | `rt_acc` | Logistic mixed model reported |
 | 13 | How Much Is Enough | `pwr.t.test`, observed power and why it is circular, sensitivity analysis, safeguard power, power by simulation, `t_TOST` | `wellbeing_scored` | Equivalence result plus the next study's n |
+| 14 | Your Own Data | `list.files`, paths, `read_csv` and type guessing, `na =`, `comment =`, writing a function, `map` + `list_rbind`, `write_csv`, error messages | files in `lab/` | Debug a broken script |
 
-5–8 missions + 1 boss per level, **90 challenges** in total.
+5–8 missions + 1 boss per level, **98 challenges** in total.
+
+### The virtual filesystem
+
+webR gives R a real filesystem, so level 14 is not a simulation of file handling — `list.files()`,
+`read_csv()` and `write_csv()` behave exactly as they do on a laptop. `rlab_make_files()` seeds
+`/home/web_user/lab/` at boot with three deliberately awkward exports (a `"DNF"` in a numeric
+column, a two-line comment preamble) and a readme that should not be read as data.
+
+Settings → *Your own data* writes a chosen file into the same folder via `webR.FS.writeFile`, so
+the course can be used on real data. The file never leaves the tab; there is no server to send it
+to, and the UI says so, because "upload" is a frightening word for someone's unpublished thesis data.
 
 ### Statistical correctness
 
@@ -256,6 +268,14 @@ settings page and the ⌨ panel render from it.
 7. Content: levels 1–5 (30 challenges).
 8. Playtest every challenge in a real browser; fix.
 9. Repo + Pages deploy; verify live link on desktop and phone widths.
+
+**Stage 8 — level 14 — done**
+24. The practical layer the course was missing: ninety missions had handed over a data frame that
+    already existed, so finishing them left you unable to start on your own CSV.
+25. Two bugs this surfaced: `purrr` was installed (as a dplyr dependency) but never **attached**,
+    so `map()` and `list_rbind()` were unavailable to any answer; and a mission that writes a file
+    could be passed by an answer that writes nothing, once an earlier attempt had created it.
+    Missions can now declare a `setup` snippet that runs before the answer, for a clean slate.
 
 **Stage 7 — level 13 — done**
 22. Power, sample size and equivalence — the two gaps the course kept gesturing at. It is also

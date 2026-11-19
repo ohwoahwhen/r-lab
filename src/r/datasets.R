@@ -344,6 +344,39 @@ rlab_make_derived <- function(env) {
   assign("wellbeing_scored", wellbeing_scored, envir = env)
 }
 
+
+# ── files on disk: level 14 works with the virtual filesystem ────────
+# webR gives R a real (virtual) filesystem, so these behave exactly like
+# files on a laptop: list.files() finds them, read_csv() reads them, and
+# they are as awkward as the exports instruments actually produce.
+
+rlab_make_files <- function(env) {
+  dir.create("/home/web_user/lab", showWarnings = FALSE, recursive = TRUE)
+  fit <- as.data.frame(get("fitness", envir = env))
+  yr <- substr(fit$test_date, 1, 4)
+  readr::write_csv(fit[yr == "2024", ], "/home/web_user/lab/fitness_2024.csv")
+  readr::write_csv(fit[yr == "2025", ], "/home/web_user/lab/fitness_2025.csv")
+
+  # An export with a preamble, the way a lot of instrument software writes.
+  hk <- as.data.frame(get("hikes", envir = env))
+  tmp <- tempfile(fileext = ".csv")
+  readr::write_csv(hk, tmp)
+  writeLines(
+    c("# TrailLog export v2.1",
+      "# generated 2025-11-20 - do not edit by hand",
+      readLines(tmp)),
+    "/home/web_user/lab/hikes_export.csv"
+  )
+  unlink(tmp)
+
+  writeLines(
+    c("Lab notebook", "", "Raw exports live in this folder.",
+      "Never edit them by hand - clean them in code so the cleaning is repeatable."),
+    "/home/web_user/lab/README.txt"
+  )
+  invisible(TRUE)
+}
+
 # ── builder ──────────────────────────────────────────────────────────
 rlab_build_data <- function(env = globalenv()) {
   mk <- list(
@@ -362,6 +395,7 @@ rlab_build_data <- function(env = globalenv()) {
     assign(nm, d, envir = env)
   }
   rlab_make_derived(env)
+  rlab_make_files(env)
   invisible(names(mk))
 }
 
