@@ -178,8 +178,33 @@ a conference deadline, a reviewer who wants effect sizes).
 | 8 | The Analysis | `aov`, eta squared, Levene, `emmeans`, `afex` mixed ANOVA, simple effects | `wellbeing_scored`, `pavlov_long` | Interaction reported in APA words |
 | 9 | Lines Through Clouds | `lm`, `predict`, control variables, `anova()` model comparison, dummy coding, moderation | `hikes_clean`, `wellbeing_scored` | Regression reported in APA words |
 | 10 | Everyone Is Different | `lmer`, variance components and ICC, Satterthwaite p values, random slopes, likelihood ratio tests, `coef()` per participant | `rt_clean` | Mixed model reported in APA words |
+| 11 | The Fine Print | paired t and *dz*, planned `contrast()`, `p.adjust` families, Type I/II/III with unequal n, sphericity and Greenhouse–Geisser, `vif()` and residual diagnostics, `wilcox.test` | `wellbeing_scored`, `pavlov_long`, `hikes_clean` | Pre-registered primary result |
 
-5–7 missions + 1 boss per level, **68 challenges** in total.
+5–8 missions + 1 boss per level, **76 challenges** in total.
+
+### Statistical correctness
+
+Level 11 exists because an audit of levels 7–10 found real gaps — no paired test, post-hoc
+comparisons but no planned ones, no multiplicity correction, no treatment of unequal n, and
+sphericity corrections applied by `afex` but never explained.
+
+The level is also where the course states its position on several things the literature
+routinely gets wrong, and earlier levels were amended to match:
+
+- **Never test-then-choose.** Running Levene (or Mauchly) and picking your main test from the
+  result is conditional testing and inflates the error rate. Decide in advance and use the
+  robust option. Level 8's Levene debrief previously recommended exactly the thing it now warns against.
+- **Type III sums of squares require sum-to-zero contrasts.** `car::Anova(m, type = 3)` on a
+  model fitted with R's default treatment contrasts silently returns the wrong main effects —
+  here F = 9.16 instead of 16.19. The mission makes the student produce both.
+- **A comparison of two groups out of three is only legitimate if planned.** Level 7's t-test
+  mission now says so explicitly and points forward to level 11.
+- **Holm dominates Bonferroni**; the choice of correction is a choice of which error to control.
+- **Non-parametric is not assumption-free**, and switching to it after disliking a t-test is p-hacking.
+- **Cronbach's .7** is a convention traceable to an offhand remark, not a threshold.
+
+`rlab_eval()` resets `options(contrasts = ...)` before every attempt, so a mission that changes
+a global option cannot leak it into the next one.
 
 ### Teaching, not just syntax
 
@@ -230,6 +255,12 @@ settings page and the ⌨ panel render from it.
 8. Playtest every challenge in a real browser; fix.
 9. Repo + Pages deploy; verify live link on desktop and phone widths.
 
+**Stage 5 — level 11 — done**
+17. The statistical-coverage audit above, the corrections to levels 7 and 8, and level 11 itself.
+18. Save codes decoupled from the level registry: `MISSION_SLOTS` is a frozen, append-only list,
+    so missions can now be inserted anywhere, in any level, without invalidating a code.
+    `npm test` fails if a mission has no slot.
+
 **Stage 4 — level 10 — done**
 15. Mixed-effects models on the trial-level reaction-time data.
 16. `rt_task` regenerated so each participant has their own congruency effect as well as their
@@ -247,7 +278,7 @@ settings page and the ⌨ panel render from it.
 12. Playtest; deploy.
 
 **Later (TODO.md keeps these)**
-Level 11+ (generalised mixed models for accuracy data), a sandbox console, mission search,
+Level 12+ (generalised mixed models for accuracy data), a sandbox console, mission search,
 "explain my error" hints keyed to R error text, keyboard-only play, PWA offline cache.
 
 ### APA string grading

@@ -51,9 +51,29 @@ Live: https://ohwoahwhen.github.io/r-lab/ · Plan: [PLAN.md](PLAN.md)
       level had nothing to teach; individual effects now span −29 ms to +97 ms
 - [x] All 68 missions replayed after the data change: 0 failed, 0 weak hints
 
+## Stage 5 — level 11 + statistical audit — DONE (19 Nov 2026)
+- [x] Audited levels 7–10 for coverage. Real gaps found: no paired test, post-hoc but no
+      planned comparisons, no multiplicity correction, nothing on unequal n or Type I/II/III,
+      sphericity corrections applied silently by afex, no regression diagnostics, no
+      rank-based alternatives
+- [x] Level 11 The Fine Print — paired t and *dz*, planned contrasts, `p.adjust` families,
+      Type I/II/III with the `contr.sum` trap, sphericity and Greenhouse–Geisser, `vif()`
+      and residual diagnostics, `wilcox.test`, pre-registered primary result boss
+- [x] Corrected what earlier levels taught: level 8's Levene debrief recommended
+      test-then-choose (now warns against it), the "14%" multiple-comparison figure assumed
+      independence, level 7's two-of-three-groups t-test now states it is only legitimate as
+      a planned comparison, and the Cronbach .7 cutoff is named as a convention
+- [x] `rlab_eval()` resets `options(contrasts = ...)` per attempt so a mission cannot leak a
+      global option into the next one
+- [x] Save codes decoupled from level order via the frozen `MISSION_SLOTS` list, so missions
+      can be inserted anywhere without invalidating a code; `npm test` enforces it
+- [x] All 76 missions replayed: 0 failed, 0 weak hints
+
 ## Backlog
-- [ ] Level 11: generalised mixed models — `glmer` on the trial-level `correct` column,
+- [ ] Level 12: generalised mixed models — `glmer` on the trial-level `correct` column,
       which is already in `rt_task` and currently unused
+- [ ] Still not covered anywhere: power analysis and sample-size planning, chi-square and
+      categorical outcomes, bootstrapping, Bayes factors, meta-analytic thinking
 - [ ] Free-play console screen with all datasets loaded
 - [ ] Error-aware hints: match common R error text → targeted advice
       (e.g. "could not find function" → "did you forget the library, or misspell it?")

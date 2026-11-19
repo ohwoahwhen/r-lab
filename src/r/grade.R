@@ -18,6 +18,9 @@
 rlab_eval <- function(code) {
   .rlab_env <<- new.env(parent = globalenv())
   .rlab_answer <<- NULL
+  # A mission that sets a global option (contrasts, most of all) must not leak
+  # it into the next one, so every attempt starts from R's defaults.
+  options(contrasts = c("contr.treatment", "contr.poly"))
 
   exprs <- tryCatch(parse(text = code), error = function(e) e)
   if (inherits(exprs, "condition")) {

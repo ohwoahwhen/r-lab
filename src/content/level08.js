@@ -13,7 +13,7 @@ export default {
     {
       id: 'l8m1',
       theory:
-        "With three groups there are three possible pairwise comparisons, and each one carries its own 5% chance of a false positive. Run all three and your real error rate is closer to 14%. ANOVA exists so you can ask one question instead of three.\n\nThe F ratio is simpler than it looks: variance *between* the group means, divided by variance *within* the groups. If the groups really are all the same, both numbers are estimating the same noise and F lands near 1. If the means are further apart than within-group noise can account for, F climbs.\n\nWhat ANOVA cannot tell you is *which* groups differ. A significant F is a door opening, not an answer.",
+        "With three groups there are three possible pairwise comparisons, and each one carries its own 5% chance of a false positive. If they were independent the chance of at least one false alarm would be about 14%; they are not independent, because they reuse the same data, so the true figure is somewhat lower \u2014 but it is still well above the 5% you think you are running at. ANOVA exists so you can ask one question instead of three.\n\nThe F ratio is simpler than it looks: variance *between* the group means, divided by variance *within* the groups. If the groups really are all the same, both numbers are estimating the same noise and F lands near 1. If the means are further apart than within-group noise can account for, F climbs.\n\nWhat ANOVA cannot tell you is *which* groups differ. A significant F is a door opening, not an answer.",
       title: 'Three groups at once',
       xp: 55,
       teach:
@@ -105,7 +105,7 @@ export default {
     {
       id: 'l8m3',
       theory:
-        "ANOVA pools the within-group variability into one estimate of noise. That is only reasonable if the groups are about equally variable \u2014 otherwise the pooled estimate is too large for some groups and too small for others, and every test built on it is slightly wrong.\n\nLevene's test checks this by running an ANOVA on how far each score sits from its own group's centre. It is one of the rare occasions where you are hoping for a non-significant result.\n\nThe subtlety is power. Levene detects trivial differences in large samples and misses real ones in small samples \u2014 exactly when you most need the warning. Read the group SDs alongside the test, not instead of it.",
+        "ANOVA pools the within-group variability into one estimate of noise. That is only reasonable if the groups are about equally variable \u2014 otherwise the pooled estimate is too large for some groups and too small for others, and every test built on it is slightly wrong.\n\nLevene's test checks this by running an ANOVA on how far each score sits from its own group's centre. It is one of the rare occasions where you are hoping for a non-significant result.\n\nThe subtlety is power. Levene detects trivial differences in large samples and misses real ones in small samples \u2014 exactly when you most need the warning. Read the group SDs alongside the test, not instead of it.\n\nThe deeper problem is what people do next. Running Levene and *then* choosing your main test based on the result is conditional testing, and it quietly inflates your overall error rate above the 5% you are claiming \u2014 the published p value does not know that a screening test decided which analysis produced it. The modern advice is to decide in advance and pick the option that is robust either way, which for two groups means always using Welch, exactly as R already does by default.",
       title: 'Check before you believe',
       xp: 55,
       teach:
@@ -128,8 +128,12 @@ export default {
         '  mutate(change = wellbeing_post - wellbeing_pre)\n\n' +
         'leveneTest(change ~ group, data = w)',
       debrief:
-        "p = .85, so the variances are fine and the ANOVA stands. Had it come out significant, Welch's " +
-        "ANOVA (`oneway.test()`) would have been the honest next step.",
+        "p = .85, and the three group SDs are close, so there is nothing here to worry about.\n\n" +
+        "What you should *not* do is treat this as a gate \u2014 run Levene, and switch tests only if it " +
+        "comes out significant. That decision rule is itself a hidden analysis step, and it makes your " +
+        "final p value mean less than it claims. If you are worried about unequal variances, use the " +
+        "robust option (`oneway.test()`, which is Welch's ANOVA) because you decided to in advance, not " +
+        "because a screening test told you to.",
       check: `local({
   w <- wellbeing_scored |> tidyr::drop_na(wellbeing_post) |>
     dplyr::mutate(change = wellbeing_post - wellbeing_pre)

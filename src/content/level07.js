@@ -57,7 +57,7 @@ export default {
     {
       id: 'l7m2',
       theory:
-        "Ten questions about self-esteem are ten noisy attempts to measure one invisible thing. Alpha asks whether they agree with each other enough to be treated as a single scale.\n\nThe logic is consistency. If the people who agree with item 1 also tend to agree with items 2 through 10, the items are picking up a shared signal. If their answers are unrelated, you do not have a scale \u2014 you have ten unrelated questions that you are about to average together, which is worse than useless.\n\nTwo cautions. Alpha rises as you add items, so a long mediocre scale can still score well. And alpha tells you nothing about *what* is being measured, only that something consistent is: a scale can be perfectly reliable and measure the wrong construct.",
+        "Ten questions about self-esteem are ten noisy attempts to measure one invisible thing. Alpha asks whether they agree with each other enough to be treated as a single scale.\n\nThe logic is consistency. If the people who agree with item 1 also tend to agree with items 2 through 10, the items are picking up a shared signal. If their answers are unrelated, you do not have a scale \u2014 you have ten unrelated questions that you are about to average together, which is worse than useless.\n\nTwo cautions. Alpha rises as you add items, so a long mediocre scale can still score well. And alpha tells you nothing about *what* is being measured, only that something consistent is: a scale can be perfectly reliable and measure the wrong construct.\n\nThe familiar \".7 is acceptable\" cutoff is a convention, not a fact. It traces back to an offhand suggestion of Nunnally's and hardened into a gate. What counts as adequate depends on the use: .7 is thin for a decision about an individual and ample for a group comparison. Report the number and let it be read, rather than labelling it pass or fail.",
       title: 'Does the scale hang together?',
       xp: 55,
       teach:
@@ -79,7 +79,7 @@ export default {
         '  select(num_range("ses", 1:10))\n\n' +
         'round(psych::alpha(as.data.frame(items))$total$raw_alpha, 3)',
       debrief:
-        "α = .84 is comfortably in the range psychology calls acceptable. Try it again on the *unscored* " +
+        "α = .84, which is solid for a group-level comparison like this one. Try it again on the *unscored* " +
         "`wellbeing` and watch it collapse — that is what a reverse-scoring mistake looks like from the outside.",
       check: `local({
   items <- as.data.frame(dplyr::select(wellbeing_scored, dplyr::num_range("ses", 1:10)))
@@ -99,7 +99,7 @@ export default {
     {
       id: 'l7m3',
       theory:
-        "The t-test asks one question. Is the gap between these two means bigger than the gap you would expect from sampling noise alone?\n\n*t* is a ratio: the difference between the means, divided by how much the means themselves bounce around from sample to sample. A *t* of 2 means the gap is twice the size of typical noise. That is also why larger samples detect smaller effects \u2014 more data shrinks the denominator, not the difference.\n\nWelch's version does not assume the two groups have equal spread. It costs almost nothing when they do and saves you when they do not, which is why R makes it the default, and why your degrees of freedom come out as 110.70 rather than a whole number.",
+        "The t-test asks one question. Is the gap between these two means bigger than the gap you would expect from sampling noise alone?\n\n*t* is a ratio: the difference between the means, divided by how much the means themselves bounce around from sample to sample. A *t* of 2 means the gap is twice the size of typical noise. That is also why larger samples detect smaller effects \u2014 more data shrinks the denominator, not the difference.\n\nWelch's version does not assume the two groups have equal spread. It costs almost nothing when they do and saves you when they do not, which is why R makes it the default, and why your degrees of freedom come out as 110.70 rather than a whole number.\n\nOne thing to be honest about here: the study has **three** groups and you are testing two of them. That is legitimate only because this comparison was planned before anyone saw the data \u2014 control versus the mindfulness arm is the study's primary question. Picking whichever two groups happened to differ most and *then* running a t-test is one of the most common forms of p-hacking in psychology, and the output looks identical either way. Level 11 covers how to do this properly.",
       title: 'Two groups, one test',
       xp: 55,
       teach:

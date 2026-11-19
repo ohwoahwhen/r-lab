@@ -1,7 +1,21 @@
 import { exportCode, importCode, compareProgress, mergeProgress } from '../src/game/savecode.js';
-import { missionOrder } from '../src/content/levels.js';
+import { missionOrder, missionsMissingSlots, MISSION_SLOTS } from '../src/content/levels.js';
 
 const order = missionOrder();
+
+// Every mission must own a permanent save-code slot, or codes silently decode
+// against the wrong missions the moment the course is edited.
+const noSlot = missionsMissingSlots();
+if (noSlot.length) {
+  console.log(`FAIL: these missions have no slot in MISSION_SLOTS: ${noSlot.join(', ')}`);
+  console.log('Append them to the END of MISSION_SLOTS in src/content/levels.js.');
+  process.exit(1);
+}
+if (new Set(MISSION_SLOTS).size !== MISSION_SLOTS.length) {
+  console.log('FAIL: MISSION_SLOTS contains a duplicate id');
+  process.exit(1);
+}
+console.log(`  ok: all ${MISSION_SLOTS.length} missions have a save-code slot`);
 let fails = 0;
 const ok = (c, m) => { if (!c) { console.log('FAIL:', m); fails++; } else console.log('  ok:', m); };
 
