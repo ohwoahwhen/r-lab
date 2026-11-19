@@ -81,10 +81,20 @@ Live: https://ohwoahwhen.github.io/r-lab/ · Plan: [PLAN.md](PLAN.md)
       no longer required. The theory now explains the version difference
 - [x] All 83 missions replayed: 0 failed, 0 weak hints
 
+## Stage 7 — level 13 — DONE (20 Nov 2026)
+- [x] Level 13 How Much Is Enough — `pwr.t.test` for sample size, observed/post-hoc power
+      taught explicitly as a fallacy, sensitivity analysis as its replacement, safeguard power
+      against publication bias, power by simulation with `replicate()`, and `t_TOST`
+      equivalence testing; boss reports an equivalence result plus the next study's n
+- [x] `pwr` and `TOSTER` added to the lazily-installed statistics set
+- [x] Two checker bugs found by the harness and fixed: `t_TOST`'s `eqb` is a data frame
+      (so `unlist()` made it character and `abs()` failed), and `pwr.t2n.test` is symmetric
+      in `d`, so a probe asserting that the signed value was wrong had to go
+- [x] All 90 missions replayed: 0 failed, 0 weak hints
+
 ## Backlog
-- [ ] Still not covered anywhere: power analysis and sample-size planning, chi-square and
-      contingency tables, bootstrapping, equivalence testing (TOST), Bayes factors,
-      mediation, meta-analytic thinking
+- [ ] Still not covered anywhere: chi-square and contingency tables, bootstrapping,
+      Bayes factors, mediation, meta-analytic thinking, multiple imputation for missing data
 - [ ] Free-play console screen with all datasets loaded
 - [ ] Error-aware hints: match common R error text → targeted advice
       (e.g. "could not find function" → "did you forget the library, or misspell it?")

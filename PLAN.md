@@ -41,8 +41,8 @@ Non-goals: no account system, no server, no analytics, no paid services.
 
 Core (eager): `dplyr 1.2.1`, `tidyr 1.3.2`, `ggplot2 4.0.3`, `readr 2.2.0`, `stringr 1.6.0`,
 `forcats 1.0.1`, `tibble`, `purrr`.
-Stats (lazy, levels 7–10): `effectsize 1.0.3`, `psych 2.6.9`, `afex 1.5-1`, `emmeans 2.0.4`,
-`car 3.1-5`, `lme4 2.0-6`, `lmerTest 3.2-1`.
+Stats (lazy, levels 7–13): `effectsize 1.0.3`, `psych 2.6.9`, `afex 1.5-1`, `emmeans 2.0.4`,
+`car 3.1-5`, `lme4 2.0-6`, `lmerTest 3.2-1`, `pwr 1.3-0`, `TOSTER 0.8.6`.
 
 Mixed models are fast enough in WebAssembly to be interactive: on 6,587 trials a random-intercept
 fit takes ~0.55 s, random slopes ~1.3 s, and a likelihood ratio test ~0.7 s.
@@ -180,8 +180,9 @@ a conference deadline, a reviewer who wants effect sizes).
 | 10 | Everyone Is Different | `lmer`, variance components and ICC, Satterthwaite p values, random slopes, likelihood ratio tests, `coef()` per participant | `rt_clean` | Mixed model reported in APA words |
 | 11 | The Fine Print | paired t and *dz*, planned `contrast()`, `p.adjust` families, Type I/II/III with unequal n, sphericity and Greenhouse–Geisser, `vif()` and residual diagnostics, `wilcox.test` | `wellbeing_scored`, `pavlov_long`, `hikes_clean` | Pre-registered primary result |
 | 12 | Right or Wrong | `glm(family = binomial)`, odds ratios, predicted probabilities, deviance and likelihood ratio tests, `glmer` | `rt_acc` | Logistic mixed model reported |
+| 13 | How Much Is Enough | `pwr.t.test`, observed power and why it is circular, sensitivity analysis, safeguard power, power by simulation, `t_TOST` | `wellbeing_scored` | Equivalence result plus the next study's n |
 
-5–8 missions + 1 boss per level, **83 challenges** in total.
+5–8 missions + 1 boss per level, **90 challenges** in total.
 
 ### Statistical correctness
 
@@ -255,6 +256,12 @@ settings page and the ⌨ panel render from it.
 7. Content: levels 1–5 (30 challenges).
 8. Playtest every challenge in a real browser; fix.
 9. Repo + Pages deploy; verify live link on desktop and phone widths.
+
+**Stage 7 — level 13 — done**
+22. Power, sample size and equivalence — the two gaps the course kept gesturing at. It is also
+    where the running claim that "non-significant does not mean no effect" finally gets its tool.
+23. The level deliberately teaches observed power as a *mistake*: it is computed, shown to be a
+    deterministic function of p, and replaced by sensitivity analysis.
 
 **Stage 6 — level 12 — done**
 19. Binary outcomes: the `correct` column, which the whole course had been filtering away.

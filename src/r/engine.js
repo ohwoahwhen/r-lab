@@ -15,7 +15,7 @@ const WEBR_VERSION = '0.6.1';
 const WEBR_URL = `https://webr.r-wasm.org/v${WEBR_VERSION}/webr.mjs`;
 
 export const CORE_PACKAGES = ['dplyr', 'tidyr', 'ggplot2', 'readr', 'stringr', 'forcats'];
-export const STATS_PACKAGES = ['effectsize', 'psych', 'car', 'afex', 'emmeans', 'lme4', 'lmerTest'];
+export const STATS_PACKAGES = ['effectsize', 'psych', 'car', 'afex', 'emmeans', 'lme4', 'lmerTest', 'pwr', 'TOSTER'];
 
 const PLOT = { width: 680, height: 440 };
 
