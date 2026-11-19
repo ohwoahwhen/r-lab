@@ -1,4 +1,5 @@
 import { THEMES, getTheme, setTheme } from '../theme.js';
+import { SHORTCUTS } from '../editor.js';
 import { esc, toast, modal, confirmBox } from '../dom.js';
 import { LEVELS, missionOrder } from '../../content/levels.js';
 import {
@@ -38,6 +39,17 @@ export function renderSettings(root, { go, onThemeChange }) {
             <span class="themecard__desc">${esc(th.desc)}</span>
           </button>`).join('')}
       </div>
+
+      <h2>Keyboard shortcuts</h2>
+      <p class="muted">The editor uses RStudio's shortcuts, so anything you learn here carries over —
+      and anything you already do in RStudio works here.</p>
+      <table class="shortcuts">
+        ${SHORTCUTS.map((sc) => `
+          <tr>
+            <td><kbd>${esc(sc.keys)}</kbd></td>
+            <td>${esc(sc.what)}${sc.rstudio ? '' : ' <span class="muted">(R Lab only — RStudio has no Submit)</span>'}</td>
+          </tr>`).join('')}
+      </table>
 
       <h2>Move your progress to another device</h2>
       <p class="muted">Your save code holds your XP, streak and every mission you have passed. Copy it on this

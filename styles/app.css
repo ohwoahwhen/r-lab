@@ -210,6 +210,23 @@ a { color: var(--accent-3); }
 .card--story { border-left: 3px solid var(--accent-2); }
 .card--story p:last-child, .card--teach p:last-child, .card--task p:last-child { margin-bottom: 0; }
 .card--teach { border-left: 3px solid var(--accent-3); }
+.card--theory { border-left: 3px solid var(--accent-3); }
+.card--theory > summary {
+  cursor: pointer; list-style: none; display: flex; align-items: center;
+  justify-content: space-between; gap: var(--sp-2); margin-bottom: 0;
+}
+.card--theory > summary::-webkit-details-marker { display: none; }
+.card--theory[open] > summary { margin-bottom: var(--sp-2); }
+.card--theory > summary .chev { transition: transform var(--speed) var(--ease); font-size: 13px; }
+.card--theory[open] > summary .chev { transform: rotate(180deg); }
+.card__label--toggle { color: var(--accent-3); }
+.theory__body { font-size: 13.5px; line-height: 1.6; }
+.theory__body p:last-child, .theory__body ul:last-child { margin-bottom: 0; }
+.theory__body ul { margin: 0 0 var(--sp-3); padding-left: 1.2em; }
+.theory__body li { margin-bottom: 4px; }
+.debrief { margin-top: var(--sp-2); font-size: 13.5px; line-height: 1.55; }
+.debrief p:last-child { margin-bottom: 0; }
+.debrief ul { margin: var(--sp-2) 0; padding-left: 1.2em; }
 .card--task { border-left: 3px solid var(--accent); }
 .card--task ul, .card--task ol { margin: 0 0 var(--sp-2); padding-left: 1.3em; line-height: 1.6; }
 .card code, .pane--brief code {
@@ -308,6 +325,11 @@ kbd {
 .themecard__swatch i { width: 22px; height: 22px; border-radius: var(--r-sm); border: 1px solid rgba(0,0,0,.18); }
 .themecard__name { font-weight: 700; font-size: 14px; }
 .themecard__desc { font-size: 12px; color: var(--fg-dim); margin-top: 2px; line-height: 1.4; }
+.shortcuts { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.shortcuts td { padding: 5px 0; border-bottom: 1px solid var(--border); vertical-align: top; }
+.shortcuts td:first-child { white-space: nowrap; padding-right: var(--sp-4); width: 1%; }
+.shortcuts tr:last-child td { border-bottom: 0; }
+
 .codebox {
   width: 100%; font-family: var(--font-mono); font-size: 12px; line-height: 1.5;
   background: var(--bg-3); color: var(--fg); border: 1px solid var(--border);

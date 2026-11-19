@@ -13,6 +13,8 @@ export default {
   missions: [
     {
       id: 'l7m1',
+      theory:
+        "A mean is a bet. If you had to guess one person's score knowing nothing else about them, the mean is your best single guess \u2014 and the standard deviation is how wrong that guess typically is.\n\nThat is why the two always travel together. A mean of 33 means something completely different when SD = 1 (everyone is basically the same) than when SD = 12 (the group is all over the place). A mean on its own is half a finding.\n\nThe habit worth building is to look at the group sizes first. Unequal *n* is not a problem in itself, but it changes which tests are safe, and it is often the first sign that something went wrong further upstream in your cleaning.",
       title: 'Describe before you test',
       xp: 50,
       teach:
@@ -54,6 +56,8 @@ export default {
     },
     {
       id: 'l7m2',
+      theory:
+        "Ten questions about self-esteem are ten noisy attempts to measure one invisible thing. Alpha asks whether they agree with each other enough to be treated as a single scale.\n\nThe logic is consistency. If the people who agree with item 1 also tend to agree with items 2 through 10, the items are picking up a shared signal. If their answers are unrelated, you do not have a scale \u2014 you have ten unrelated questions that you are about to average together, which is worse than useless.\n\nTwo cautions. Alpha rises as you add items, so a long mediocre scale can still score well. And alpha tells you nothing about *what* is being measured, only that something consistent is: a scale can be perfectly reliable and measure the wrong construct.",
       title: 'Does the scale hang together?',
       xp: 55,
       teach:
@@ -94,6 +98,8 @@ export default {
     },
     {
       id: 'l7m3',
+      theory:
+        "The t-test asks one question. Is the gap between these two means bigger than the gap you would expect from sampling noise alone?\n\n*t* is a ratio: the difference between the means, divided by how much the means themselves bounce around from sample to sample. A *t* of 2 means the gap is twice the size of typical noise. That is also why larger samples detect smaller effects \u2014 more data shrinks the denominator, not the difference.\n\nWelch's version does not assume the two groups have equal spread. It costs almost nothing when they do and saves you when they do not, which is why R makes it the default, and why your degrees of freedom come out as 110.70 rather than a whole number.",
       title: 'Two groups, one test',
       xp: 55,
       teach:
@@ -133,6 +139,8 @@ export default {
     },
     {
       id: 'l7m4',
+      theory:
+        "*p* answers \"could this be noise?\". *d* answers \"is it big?\". They are different questions, and a large enough sample will hand you a tiny *p* for an effect nobody would care about.\n\n*d* puts the difference in standard deviation units, so *d* = 0.5 means the groups sit half a standard deviation apart. Cohen's landmarks of .2, .5 and .8 were offered as a last resort for fields with no better yardstick \u2014 where you know the literature, compare against what others have found instead.\n\nThe interval matters more than the point estimate. From \u22120.82 to \u22120.07 says the data are consistent with a sizeable effect and also with one that barely exists. That uncertainty is real, and reporting it is the honest move.",
       title: 'How big is it, though',
       xp: 55,
       teach:
@@ -174,6 +182,8 @@ export default {
     },
     {
       id: 'l7m5',
+      theory:
+        "*r* measures how tightly two variables move together, from \u22121 through 0 to 1. It is scale-free: it does not care whether you measured in points, centimetres or dollars.\n\nSquare it and it becomes interpretable. *r* = .64 gives *r\u00b2* = .41, so about 41% of the variation in one variable lines up with the other, and the remaining 59% is everything else.\n\nTwo traps. *r* only sees straight-line relationships, so a perfect U-shape can produce an *r* near zero. And a correlation between two measures taken at the same time, from the same person, in the same questionnaire, is partly just shared method \u2014 not a discovery.",
       title: 'Two things that move together',
       xp: 50,
       teach:
@@ -205,6 +215,8 @@ export default {
     },
     {
       id: 'l7m6',
+      theory:
+        "The formatting rules are not fussiness for its own sake. Each one exists to stop a specific misreading.\n\nThe leading zero is dropped from *p* because *p* can never exceed 1 \u2014 the space in front of the decimal point can never be used, so removing it signals \"this is a probability\". And *p* is never reported as .000, because that claims an impossible certainty. What you actually mean is \"smaller than my rounding can show\", which is written *p* < .001.\n\nDegrees of freedom sit in the brackets because they tell the reader how much data stood behind the number. Two studies both reporting *t* = 2.38 are not equally convincing if one has df = 10 and the other df = 500.",
       title: 'Write it the way APA wants it',
       xp: 60,
       teach:
@@ -254,6 +266,8 @@ export default {
     },
     {
       id: 'l7boss',
+      theory:
+        "A results sentence is a self-contained argument: here is what the groups looked like, here is the test, here is how big the difference was. A reader should be able to check your arithmetic, compute an effect size you did not report, or drop your study into a meta-analysis, without emailing you.\n\nThat is why the descriptives come first. A test statistic without the means is a verdict with no evidence attached.",
       title: 'Boss: the paragraph the reviewer wanted',
       boss: true,
       xp: 170,

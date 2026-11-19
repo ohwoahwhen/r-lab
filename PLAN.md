@@ -134,9 +134,18 @@ and the computed layer data. Reports differences in words, never pixel diffing.
 
 ### Save codes
 
-`r-lab.v1.<base64url(deflate(JSON))>` with a short checksum, grouped in dashes for readability.
-Import validates version + checksum, decodes, then compares total XP and mission count against
-local progress. If the incoming code is *worse*, it asks before replacing. Never silent.
+`RLAB1-` followed by Crockford base32, grouped in dashes for readability. Crockford rather than
+base64url because its alphabet contains no `-`, so the readability dashes can never be confused
+with data, and because O/0 and I/1/L mix-ups are forgiven on import.
+
+The payload is a fixed header (XP, streak, best streak, last-played day, slot count) and then
+**three bits per mission** — one for passed, two for hints revealed — so the code grows by about
+one character per three missions rather than one per mission. 61 missions fit in 70 characters.
+Format v1, which used a whole byte per mission, is still read on import.
+
+Import validates the prefix, the canonical encoding and a checksum, then compares total XP and
+mission count against local progress. If the incoming code is *worse*, it asks before replacing,
+and offers a merge that keeps the best of both. Never silent.
 
 All `localStorage` access goes through `safeGet`/`safeSet` with try/catch, so private
 windows and blocked storage degrade to in-memory progress with a visible notice.
@@ -159,8 +168,27 @@ a conference deadline, a reviewer who wants effect sizes).
 | 6 | Polish | facets, scales, colour, themes, annotation | `hikes_clean`, `pavlov_long` | Recreate a publication figure with error bars |
 | 7 | Numbers That Mean Something | descriptives, Cronbach's alpha, `t.test`, `cor.test`, Cohen's d, APA strings | `wellbeing_scored` | Full APA results sentence |
 | 8 | The Analysis | `aov`, eta squared, Levene, `emmeans`, `afex` mixed ANOVA, simple effects | `wellbeing_scored`, `pavlov_long` | Interaction reported in APA words |
+| 9 | Lines Through Clouds | `lm`, `predict`, control variables, `anova()` model comparison, dummy coding, moderation | `hikes_clean`, `wellbeing_scored` | Regression reported in APA words |
 
-5–6 missions + 1 boss per level, **53 challenges** in total.
+5–7 missions + 1 boss per level, **61 challenges** in total.
+
+### Teaching, not just syntax
+
+Every mission in levels 7–9 carries a `theory` field, rendered as a collapsible **The idea**
+card above the task. It is deliberately not a restatement of the `teach` line: `teach` says
+what to type, `theory` says what the number means, why the convention exists, and which
+mistake it exists to prevent. Three short paragraphs is the target; it collapses for anyone
+who already knows.
+
+### Editor shortcuts
+
+The editor implements RStudio's keymap so the habits transfer in both directions: `Alt+-`
+inserts `<-`, `Cmd/Ctrl+Shift+M` inserts `|>`, `Cmd/Ctrl+Shift+C` toggles comments,
+`Cmd/Ctrl+D` deletes a line, `Alt+↑/↓` moves one, `Ctrl+L` clears the output, `Cmd/Ctrl+F`
+searches. `Cmd/Ctrl+Enter` runs the selection if there is one and the whole script otherwise,
+exactly as RStudio does. Submit (`Cmd/Ctrl+Shift+Enter`) is the one binding with no RStudio
+equivalent. The list lives in one place, `SHORTCUTS` in `src/ui/editor.js`, and both the
+settings page and the ⌨ panel render from it.
 
 ### Datasets (all seeded, all deliberately messy)
 
@@ -189,13 +217,18 @@ a conference deadline, a reviewer who wants effect sizes).
 8. Playtest every challenge in a real browser; fix.
 9. Repo + Pages deploy; verify live link on desktop and phone widths.
 
+**Stage 3 — level 9 — done**
+13. Regression: `lm`, `summary`, `predict`, multiple predictors, nested model comparison,
+    dummy coding, moderation, and an APA regression sentence.
+14. The theory layer across levels 7–9, and the RStudio keymap.
+
 **Stage 2 — levels 6–8 — done**
 10. Lazy stats package install, gated per level with its own progress UI and a retry path.
 11. Levels 6, 7, 8 (21 challenges) incl. APA-string checkers and a mixed ANOVA with afex/emmeans.
 12. Playtest; deploy.
 
 **Later (TODO.md keeps these)**
-Level 9+ (regression, mixed models), a sandbox console with all datasets, mission search,
+Level 10+ (mixed models), a sandbox console with all datasets, mission search,
 "explain my error" hints keyed to R error text, keyboard-only play, PWA offline cache.
 
 ### APA string grading

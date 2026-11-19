@@ -19,6 +19,12 @@ from the webR package repository on first visit and cached by your browser after
   aesthetic mappings, facets, scales and labels, so the feedback can say *what* is different
   rather than "wrong".
 - **Specific feedback.** Three hints per mission, revealed one at a time for a little XP.
+- **Theory, not just syntax.** Every mission in the statistics levels opens with *The idea* —
+  what the number actually means, why the convention exists, and the mistake it is there to
+  prevent. Collapse it if you already know.
+- **RStudio's keyboard shortcuts**, so the habits transfer both ways: `Alt+-` for `<-`,
+  `Cmd/Ctrl+Shift+M` for the pipe, `Cmd/Ctrl+Shift+C` to comment, `Cmd/Ctrl+Enter` to run the
+  selection, and the rest. The full list is in Settings, or the ⌨ button above the editor.
 - **XP, ranks, daily streak, boss challenges** at the end of each level.
 - **Save codes** move your progress between devices with no account: export a short code on
   one device, paste it on another. Importing never silently overwrites better progress.
@@ -35,9 +41,10 @@ from the webR package repository on first visit and cached by your browser after
 | 6 | Polish | facets, scales, manual colours, themes, annotation |
 | 7 | Numbers That Mean Something | descriptives, Cronbach's alpha, t-tests, correlations, Cohen's d, APA reporting |
 | 8 | The Analysis | one-way ANOVA, eta squared, Levene's test, `emmeans` post-hocs, mixed ANOVA with `afex`, simple effects |
+| 9 | Lines Through Clouds | regression, prediction, control variables, model comparison, dummy coding, moderation |
 
-53 missions in all, including eight boss challenges and two recreate-the-chart tasks.
-Levels 7 and 8 fetch `effectsize`, `psych`, `car`, `afex` and `emmeans` the first time you
+61 missions in all, including nine boss challenges and two recreate-the-chart tasks.
+Levels 7, 8 and 9 fetch `effectsize`, `psych`, `car`, `afex` and `emmeans` the first time you
 open one — about 20 MB that the earlier levels never download.
 
 The datasets are simulated but deliberately messy — typo'd category labels, missing values,

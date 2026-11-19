@@ -10,9 +10,12 @@
  *   5      best streak  (capped 255)
  *   6..7   last-played day, days since 2024-01-01 (0 = never)
  *   8      number of mission slots that follow
- *   9..    one byte per mission, in registry order:
- *            0x80 = passed, low 2 bits = hints revealed
+ *   9..    three bits per mission, in registry order, packed most significant
+ *            bit first: bit 2 = passed, bits 0-1 = hints revealed
  *   last 2 FNV-1a checksum of everything before it
+ *
+ * Format 1 stored a whole byte per mission (0x80 = passed, low 2 bits = hints).
+ * It is still read on import so codes saved before the change keep working.
  *
  * The bytes are then Crockford base32 encoded and grouped with dashes.
  *
@@ -22,7 +25,7 @@
 
 const EPOCH = Date.UTC(2024, 0, 1) / 86400000;
 const PREFIX = 'RLAB1';
-const FMT = 1;
+const FMT = 2;          // v2 packs three bits per mission; v1 used a whole byte
 
 /*
  * Crockford base32: uppercase letters and digits with I, L, O and U removed.
@@ -114,11 +117,19 @@ export function exportCode(state, order) {
   const dn = dayNum(state.lastDay);
   body.push((dn >> 8) & 255, dn & 255);
   body.push(Math.min(255, order.length));
+  let bits = 0;
+  let acc = 0;
   for (const id of order) {
     const rec = (state.missions || {})[id] || {};
     const hints = Math.min(3, rec.hints || 0);
-    body.push((rec.done ? 0x80 : 0) | hints);
+    acc = (acc << 3) | ((rec.done ? 4 : 0) | hints);
+    bits += 3;
+    while (bits >= 8) {
+      body.push((acc >>> (bits - 8)) & 255);
+      bits -= 8;
+    }
   }
+  if (bits > 0) body.push((acc << (8 - bits)) & 255);
   const sum = fnv16(body);
   body.push((sum >> 8) & 255, sum & 255);
   return `${PREFIX}-${group(toB32(Uint8Array.from(body)))}`;
@@ -149,8 +160,8 @@ export function importCode(text, order) {
   if (fnv16(body) !== want) {
     return { ok: false, error: 'That code failed its checksum, so a character is wrong or missing. Copy the whole code and try again.' };
   }
-  if (body[0] !== FMT) {
-    return { ok: false, error: `That code is format v${body[0]}, and this version of R Lab reads v${FMT}.` };
+  if (body[0] !== FMT && body[0] !== 1) {
+    return { ok: false, error: `That code is format v${body[0]}, which this version of R Lab does not know how to read.` };
   }
 
   const xp = (body[1] << 16) | (body[2] << 8) | body[3];
@@ -159,13 +170,27 @@ export function importCode(text, order) {
   const lastDay = dayIso((body[6] << 8) | body[7]);
   const slots = body[8];
   const missions = {};
+  const slotValue = body[0] === 1
+    ? (i) => {
+      const b = body[9 + i];
+      return b === undefined ? undefined : ((b & 0x80 ? 4 : 0) | (b & 3));
+    }
+    : (i) => {
+      const bit = i * 3;
+      const byte = body[9 + (bit >> 3)];
+      if (byte === undefined) return undefined;
+      // A slot can straddle two bytes, so read 16 bits and shift the window.
+      const next = body[9 + (bit >> 3) + 1] || 0;
+      const window = (byte << 8) | next;
+      return (window >>> (13 - (bit & 7))) & 7;
+    };
   for (let i = 0; i < slots; i++) {
-    const b = body[9 + i];
-    if (b === undefined) break;
+    const v = slotValue(i);
+    if (v === undefined) break;
     const id = order[i];
     if (!id) continue;                 // code from a build with more missions
-    const done = !!(b & 0x80);
-    const hints = b & 3;
+    const done = !!(v & 4);
+    const hints = v & 3;
     if (done || hints) missions[id] = { done, hints, tries: done ? 1 : 0 };
   }
   return {

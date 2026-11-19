@@ -1,6 +1,6 @@
 import { findMission, nextMission, LEVELS } from '../../content/levels.js';
 import { esc, md, mdp, toast, modal } from '../dom.js';
-import { createEditor } from '../editor.js';
+import { createEditor, SHORTCUTS, IS_MAC } from '../editor.js';
 import { drawImages } from '../plot.js';
 import { runCode, gradeAnswer, renderPlot, peekData, shapeData, ensureStatsPackages, statsReady } from '../../r/engine.js';
 import {
@@ -43,6 +43,11 @@ export function renderMission(root, { go, missionId }) {
             <div class="card__label">Lab notebook</div>
             ${mdp(mission.teach)}
           </div>
+          ${mission.theory ? `
+          <details class="card card--theory" open>
+            <summary class="card__label card__label--toggle">The idea <span class="chev">▾</span></summary>
+            <div class="theory__body">${paras(mission.theory)}</div>
+          </details>` : ''}
           <div class="card card--task">
             <div class="card__label">Your task</div>
             ${taskHtml(mission.task)}
@@ -61,6 +66,7 @@ export function renderMission(root, { go, missionId }) {
               <div class="editorwrap__bar">
                 <span>R</span>
                 <span class="spacer"></span>
+                <button class="btn btn--sm btn--ghost" id="shortcuts" title="Keyboard shortcuts">⌨</button>
                 <button class="btn btn--sm btn--ghost" id="reset-code">Reset code</button>
               </div>
               <div id="editor"></div>
@@ -88,12 +94,14 @@ export function renderMission(root, { go, missionId }) {
     doc: draft != null ? draft : (mission.starter || ''),
     onRun: () => doRun(),
     onSubmit: () => doSubmit(),
+    onClearOutput: () => clearOutput(),
   });
   active = { editor, missionId: mission.id };
 
   editor.view.dom.addEventListener('keyup', () => draftCache.set(mission.id, editor.value));
 
   $('#back').addEventListener('click', () => go('level', { levelId: level.id }));
+  $('#shortcuts').addEventListener('click', showShortcuts);
   $('#reset-code').addEventListener('click', () => {
     editor.value = mission.starter || '';
     draftCache.set(mission.id, editor.value);
@@ -262,9 +270,11 @@ export function renderMission(root, { go, missionId }) {
     }
   }
 
-  async function execute() {
-    const code = editor.value;
-    draftCache.set(mission.id, code);
+  async function execute({ selectionOnly = false } = {}) {
+    const whole = editor.value;
+    draftCache.set(mission.id, whole);
+    const selected = editor.selection();
+    const code = selectionOnly && selected.trim() ? selected : whole;
     const res = await runCode(code);
     const out = $('#out');
     if (res.text && res.text.trim()) {
@@ -295,9 +305,10 @@ export function renderMission(root, { go, missionId }) {
   async function doRun() {
     if (busy) return;
     if (level.needsStats && !statsReady()) { await ensureStats(); if (!statsReady()) return; }
-    setBusy(true, 'Running your R…');
+    const partial = editor.selection().trim().length > 0;
+    setBusy(true, partial ? 'Running the selected lines…' : 'Running your R…');
     try {
-      const res = await execute();
+      const res = await execute({ selectionOnly: true });
       $('#verdict').innerHTML = res.status === 'ok'
         ? ''
         : `<div class="verdict verdict--fail"><div class="verdict__title">R stopped with an error</div>${md(res.message || '')}</div>`;
@@ -343,7 +354,7 @@ export function renderMission(root, { go, missionId }) {
       $('#verdict').innerHTML = `<div class="verdict verdict--pass">
         <div class="verdict__title">✓ ${before ? 'Still correct' : 'Correct'}</div>
         <p style="margin:0">${award.gain > 0 ? `<strong>+${award.gain} XP</strong>${award.spent ? ` (${award.spent} XP went on hints)` : ''}.` : 'You had already passed this one, so no new XP.'}
-        ${mission.debrief ? ` ${md(mission.debrief)}` : ''}</p>
+        </p>${mission.debrief ? `<div class="debrief">${paras(mission.debrief)}</div>` : ''}
         <div class="row">
           ${nxt ? `<button class="btn btn--primary btn--sm" id="go-next">Next mission →</button>` : ''}
           <button class="btn btn--sm" id="go-level">Back to level ${level.n}</button>
@@ -384,11 +395,49 @@ export function renderMission(root, { go, missionId }) {
   setTimeout(() => editor.focus(), 60);
 }
 
+function clearOutput() {
+  const out = document.querySelector('#out');
+  const plot = document.querySelector('#plot');
+  const verdict = document.querySelector('#verdict');
+  if (out) {
+    out.textContent = '';
+    out.innerHTML = '<span class="out__empty">Output cleared.</span>';
+    out.classList.remove('out--err');
+  }
+  if (plot) plot.innerHTML = '';
+  if (verdict) verdict.innerHTML = '';
+}
+
+function showShortcuts() {
+  const rows = SHORTCUTS.map((s) => `
+    <tr>
+      <td style="white-space:nowrap;padding:4px 12px 4px 0"><kbd>${esc(s.keys)}</kbd></td>
+      <td style="padding:4px 0">${esc(s.what)}${s.rstudio ? '' : ' <span class="muted">(R Lab only)</span>'}</td>
+    </tr>`).join('');
+  return modal({
+    title: 'Keyboard shortcuts',
+    body: `<p class="muted">These match RStudio, so the habits carry over. The one exception is
+      Submit, which RStudio has no equivalent for.</p>
+      <table style="width:100%;border-collapse:collapse;font-size:13.5px">${rows}</table>`,
+    actions: [{ label: 'Got it', value: true, primary: true }],
+  });
+}
+
 /** Mac shows the command key, everyone else shows Ctrl. */
 function kbdHint() {
-  const mac = /Mac|iPhone|iPad/i.test(navigator.platform || navigator.userAgent || '');
-  const mod = mac ? '⌘' : 'Ctrl';
+  const mod = IS_MAC ? '⌘' : 'Ctrl';
   return `<kbd>${mod}</kbd>+<kbd>↵</kbd> run · <kbd>${mod}</kbd>+<kbd>⇧</kbd>+<kbd>↵</kbd> submit`;
+}
+
+/** Blank-line separated prose, with `-` bullets, for theory and debrief text. */
+function paras(text) {
+  return String(text).split(/\n\n+/).map((block) => {
+    if (/^\s*-\s+/m.test(block)) {
+      const items = block.split('\n').filter((l) => l.trim());
+      return `<ul>${items.map((l) => `<li>${md(l.replace(/^\s*-\s+/, ''))}</li>`).join('')}</ul>`;
+    }
+    return `<p>${md(block)}</p>`;
+  }).join('');
 }
 
 function taskHtml(task) {

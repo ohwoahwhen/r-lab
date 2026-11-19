@@ -12,6 +12,8 @@ export default {
   missions: [
     {
       id: 'l8m1',
+      theory:
+        "With three groups there are three possible pairwise comparisons, and each one carries its own 5% chance of a false positive. Run all three and your real error rate is closer to 14%. ANOVA exists so you can ask one question instead of three.\n\nThe F ratio is simpler than it looks: variance *between* the group means, divided by variance *within* the groups. If the groups really are all the same, both numbers are estimating the same noise and F lands near 1. If the means are further apart than within-group noise can account for, F climbs.\n\nWhat ANOVA cannot tell you is *which* groups differ. A significant F is a door opening, not an answer.",
       title: 'Three groups at once',
       xp: 55,
       teach:
@@ -60,6 +62,8 @@ export default {
     },
     {
       id: 'l8m2',
+      theory:
+        "\u03b7\u00b2 is R\u00b2 wearing a different hat \u2014 the proportion of total variation in the outcome that goes with the grouping. \u03b7\u00b2 = .18 means condition accounts for roughly 18% of why people's change scores differ, and the other 82% is individual differences, measurement error and everything you did not measure.\n\nIn psychology 18% is a lot. You are predicting human behaviour from a single manipulation, and most of what makes people different was never in your design.\n\n\u03b7\u00b2 is biased upwards in small samples, because it describes *your* sample rather than the population. \u03c9\u00b2 and partial \u03b7\u00b2 are the usual corrections when the number has to carry weight.",
       title: 'How much does the grouping explain?',
       xp: 50,
       teach:
@@ -100,6 +104,8 @@ export default {
     },
     {
       id: 'l8m3',
+      theory:
+        "ANOVA pools the within-group variability into one estimate of noise. That is only reasonable if the groups are about equally variable \u2014 otherwise the pooled estimate is too large for some groups and too small for others, and every test built on it is slightly wrong.\n\nLevene's test checks this by running an ANOVA on how far each score sits from its own group's centre. It is one of the rare occasions where you are hoping for a non-significant result.\n\nThe subtlety is power. Levene detects trivial differences in large samples and misses real ones in small samples \u2014 exactly when you most need the warning. Read the group SDs alongside the test, not instead of it.",
       title: 'Check before you believe',
       xp: 55,
       teach:
@@ -141,6 +147,8 @@ export default {
     },
     {
       id: 'l8m4',
+      theory:
+        "Now you can ask which groups differ, and you are immediately back in the multiple-comparison problem that ANOVA was protecting you from. Tukey's correction widens the p values to account for how many comparisons you are making, so the error rate across the whole family stays at 5%.\n\n\"Estimated marginal means\" are means predicted *by the model* rather than raw group averages. In a simple one-way design they are identical. The moment you add a covariate or your cells are unbalanced they part company, and the model-based ones are what your test is actually about.\n\nA non-significant pairwise comparison is not evidence that two groups are the same. It is a failure to show that they differ.",
       title: 'Which groups, though?',
       xp: 60,
       teach:
@@ -191,6 +199,8 @@ export default {
     },
     {
       id: 'l8m5',
+      theory:
+        "Every animal contributes two numbers, one per cue, and those two numbers are not independent: an animal that suppresses a lot does so for both. Treating them as two unrelated observations throws away the pairing and inflates the error term.\n\nA within-subjects factor uses each subject as their own control, which is why repeated-measures designs are so much more sensitive than between-subjects ones. The cost is bookkeeping \u2014 the model has to know who is who, which is exactly what the `id` argument is for.\n\nMixed means both at once: cue varies within animals, drug varies between them. The interaction is usually the interesting term, because it asks whether the drug changed *what the animals learned*, rather than just how much they moved.",
       title: 'Between and within at once',
       xp: 65,
       teach:
@@ -245,6 +255,8 @@ export default {
     },
     {
       id: 'l8m6',
+      theory:
+        "An interaction is a claim that one answer is not enough: the effect of the drug is one thing for the CS+ and a different thing for the CS\u2212. The interaction test tells you those two effects differ. It does not tell you what either of them is.\n\nSo you split it. Comparing the drugs within each cue separately turns one ambiguous result into two interpretable ones.\n\nThe discipline is to decide what you will split by *before* you look at the data. Simple effects chosen after seeing the pattern are a p-hacking machine, and nothing in the output lets a reader tell the difference.",
       title: 'Take the interaction apart',
       xp: 60,
       teach:
@@ -297,6 +309,8 @@ export default {
     },
     {
       id: 'l8boss',
+      theory:
+        "The order of a results paragraph mirrors the logic of the analysis: the overall test that licensed you to look closer, then the comparisons that say what is going on. Leading with the comparison you liked best hides the fact that you were allowed to go looking.\n\nThe non-significant simple effect belongs in the same breath as the significant one. Here the *selectivity* is the finding \u2014 a drug that blunted everything equally would be a far less interesting drug.",
       title: 'Boss: the result, in words',
       boss: true,
       xp: 180,

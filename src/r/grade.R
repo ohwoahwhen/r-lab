@@ -790,3 +790,93 @@ rlab_anova_col <- function(row, which) {
   if (!length(hit)) return(NULL)
   unname(row[[hit[1]]])
 }
+
+# ── level 9: linear models ───────────────────────────────────────────
+
+rlab_want_lm <- function(x, what = "the model from `lm()`") {
+  if (inherits(x, "summary.lm"))
+    return("That is the *summary* of the model. This mission wants the model object itself, so leave `summary()` off.")
+  if (!inherits(x, "lm"))
+    return(sprintf("Your answer should be %s, but it is %s. %s", what, rlab_desc(x),
+                   rlab_hint_lastline()))
+  character(0)
+}
+
+rlab_want_summary_lm <- function(x) {
+  if (inherits(x, "lm") && !inherits(x, "summary.lm"))
+    return("That is the model itself, which prints only the coefficients. Wrap it in `summary()` to get R squared and the tests.")
+  if (!inherits(x, "summary.lm"))
+    return(sprintf("Your answer should be the summary of an `lm()` model, but it is %s. %s",
+                   rlab_desc(x), rlab_hint_lastline()))
+  character(0)
+}
+
+rlab_coefs <- function(x) {
+  if (inherits(x, "summary.lm")) return(x$coefficients[, "Estimate"])
+  tryCatch(stats::coef(x), error = function(e) NULL)
+}
+
+rlab_coef_table <- function(x) {
+  if (inherits(x, "summary.lm")) return(x$coefficients)
+  tryCatch(summary(x)$coefficients, error = function(e) NULL)
+}
+
+rlab_want_coef_names <- function(x, want) {
+  got <- names(rlab_coefs(x))
+  if (is.null(got)) return(character(0))
+  miss <- setdiff(want, got)
+  extra <- setdiff(got, want)
+  out <- character(0)
+  if (length(miss))
+    out <- c(out, sprintf("The model is missing %s. Your terms are: %s.",
+                          paste0("`", miss, "`", collapse = ", "),
+                          paste0("`", got, "`", collapse = ", ")))
+  if (length(extra))
+    out <- c(out, sprintf("The model has extra terms I didn't ask for: %s.",
+                          paste0("`", extra, "`", collapse = ", ")))
+  out
+}
+
+rlab_want_coef <- function(x, name, value, tol = 1e-3) {
+  co <- rlab_coefs(x)
+  if (is.null(co)) return(character(0))
+  if (!name %in% names(co))
+    return(sprintf("There is no `%s` term in your model. It has: %s.", name,
+                   paste0("`", names(co), "`", collapse = ", ")))
+  rlab_want_value(unname(co[[name]]), value, sprintf("the coefficient for `%s`", name), tol = tol)
+}
+
+rlab_r2 <- function(x) {
+  if (inherits(x, "summary.lm")) return(x$r.squared)
+  tryCatch(summary(x)$r.squared, error = function(e) NULL)
+}
+
+rlab_want_r2 <- function(x, value, tol = 1e-4) {
+  got <- rlab_r2(x)
+  if (is.null(got)) return(character(0))
+  rlab_want_value(got, value, "R squared", tol = tol)
+}
+
+rlab_want_model_n <- function(x, n) {
+  got <- tryCatch(stats::df.residual(x) + length(rlab_coefs(x)), error = function(e) NULL)
+  if (is.null(got)) return(character(0))
+  if (!identical(as.integer(got), as.integer(n)))
+    return(sprintf("Your model was fitted on %d observations, I expected %d.", got, n))
+  character(0)
+}
+
+# anova(m1, m2) model comparison
+rlab_want_model_comparison <- function(x, want) {
+  if (!is.data.frame(x))
+    return(sprintf("Your answer should be the result of `anova()` comparing two models, but it is %s. %s",
+                   rlab_desc(x), rlab_hint_lastline()))
+  if (nrow(x) < 2)
+    return("That table has only one row, so only one model went into it. `anova()` needs both models: `anova(m1, m2)`.")
+  if (!("F" %in% names(x)))
+    return(sprintf("I can't find an F column in your table. Its columns are: %s.",
+                   paste0("`", names(x), "`", collapse = ", ")))
+  rlab_seq(
+    rlab_want_value(x[["F"]][2], want[["F"]][2], "the F for the comparison", tol = 1e-3),
+    rlab_want_value(x[["Pr(>F)"]][2], want[["Pr(>F)"]][2], "the p value for the comparison", tol = 1e-6)
+  )
+}

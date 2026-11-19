@@ -17,7 +17,7 @@ const state = {
 const code = exportCode(state, order);
 console.log('code:', code, `(${code.length} chars)`);
 ok(code.startsWith('RLAB1-'), 'has prefix');
-ok(code.length < 130, 'short enough to paste anywhere');
+ok(code.length < 100, 'short enough to paste anywhere: ' + code.length + ' chars');
 
 const back = importCode(code, order);
 ok(back.ok, 'round-trips');
@@ -57,6 +57,29 @@ ok(merged.xp === 1234, 'merge keeps higher xp');
 ok(merged.missions.l2m1.done && merged.missions.l5boss.done, 'merge unions passes');
 ok(Object.values(merged.missions).filter(m=>m.done).length === 5, 'merge has 5 passes (union of 3 and 4 with 2 shared)');
 ok(merged.bestStreak === 19 && merged.lastDay === '2026-11-19', 'merge keeps best streak and newest day');
+
+// codes written by the previous format must still import
+const v1 = (() => {
+  const body = [1, 0, 4, 210, 7, 19, 0, 0, order.length];
+  for (const id of order) {
+    const rec = state.missions[id] || {};
+    body.push((rec.done ? 0x80 : 0) | Math.min(3, rec.hints || 0));
+  }
+  let h = 0x811c9dc5;
+  for (const b of body) { h ^= b; h = (h * 0x01000193) >>> 0; }
+  const sum = ((h >>> 16) ^ (h & 0xffff)) & 0xffff;
+  body.push((sum >> 8) & 255, sum & 255);
+  const B32 = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+  let bits = 0, val = 0, outp = '';
+  for (const b of body) { val = (val << 8) | b; bits += 8; while (bits >= 5) { outp += B32[(val >>> (bits - 5)) & 31]; bits -= 5; } }
+  if (bits > 0) outp += B32[(val << (5 - bits)) & 31];
+  return 'RLAB1-' + outp;
+})();
+const v1r = importCode(v1, order);
+ok(v1r.ok, 'a format v1 code still imports: ' + (v1r.error || ''));
+ok(v1r.ok && v1r.state.missions.l1boss.done === true, 'v1 passes decode correctly');
+ok(v1r.ok && v1r.state.missions.l1m2.hints === 2, 'v1 hint counts decode correctly');
+ok(v1r.ok && Object.values(v1r.state.missions).filter(m=>m.done).length === 4, 'v1 has 4 passes');
 
 // a save from a future build with more missions must not crash
 const future = exportCode({ ...state, missions: { ...state.missions, zz99: { done: true } } }, [...order, 'zz99']);
