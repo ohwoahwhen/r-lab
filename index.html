@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en" data-theme="night">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="description" content="R Lab — learn tidyverse, ggplot2 and psych stats by writing real R in your browser." />
+<meta name="color-scheme" content="dark light" />
+<title>R Lab</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230f1720'/%3E%3Ctext x='16' y='23' font-family='monospace' font-size='19' font-weight='bold' text-anchor='middle' fill='%234ade80'%3ER%3C/text%3E%3C/svg%3E" />
+<link rel="stylesheet" href="./styles/tokens.css" />
+<link rel="stylesheet" href="./styles/app.css" />
+</head>
+<body>
+<div id="app">
+  <!-- ══ Loading ══ -->
+  <section id="screen-loading" class="screen screen--loading is-active">
+    <div class="boot">
+      <div class="boot__logo"><span class="boot__r">R</span> LAB</div>
+      <p class="boot__tag">Real R. In your browser. No install.</p>
+      <div class="boot__bar"><div class="boot__fill" id="boot-fill"></div></div>
+      <p class="boot__status" id="boot-status">Waking up…</p>
+      <ul class="boot__steps" id="boot-steps"></ul>
+      <p class="boot__note" id="boot-note">First visit downloads R itself (~40&nbsp;MB) plus the tidyverse packages. Later visits come from your browser cache and are much faster.</p>
+      <div class="boot__error" id="boot-error" hidden>
+        <p id="boot-error-msg"></p>
+        <button class="btn" id="boot-retry">Try again</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ App chrome ══ -->
+  <header class="topbar" id="topbar" hidden>
+    <button class="topbar__home" id="nav-map" title="Level map" aria-label="Level map">
+      <span class="topbar__logo"><span class="boot__r">R</span> LAB</span>
+    </button>
+    <div class="topbar__xp">
+      <div class="xp">
+        <div class="xp__row">
+          <span class="xp__rank" id="hud-rank">Volunteer RA</span>
+          <span class="xp__num" id="hud-xp">0 XP</span>
+        </div>
+        <div class="xp__bar"><div class="xp__fill" id="hud-xp-fill"></div></div>
+      </div>
+    </div>
+    <div class="topbar__right">
+      <button class="streak" id="hud-streak" title="Daily streak">
+        <span class="streak__flame">🔥</span><span id="hud-streak-n">0</span>
+      </button>
+      <button class="iconbtn" id="nav-settings" title="Settings" aria-label="Settings">⚙</button>
+    </div>
+  </header>
+
+  <!-- ══ Level map ══ -->
+  <section id="screen-map" class="screen screen--map"></section>
+
+  <!-- ══ Mission ══ -->
+  <section id="screen-mission" class="screen screen--mission"></section>
+
+  <!-- ══ Settings ══ -->
+  <section id="screen-settings" class="screen screen--settings"></section>
+
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+  <div id="modal-root"></div>
+</div>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>

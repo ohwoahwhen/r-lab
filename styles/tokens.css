@@ -1,0 +1,100 @@
+/* ───────── Design tokens + the three themes ───────── */
+
+:root {
+  --font-ui: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --font-display: var(--font-ui);
+
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 16px;
+  --r-pill: 999px;
+
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 24px; --sp-6: 32px; --sp-7: 48px;
+
+  --speed: 160ms;
+  --ease: cubic-bezier(.2, .7, .3, 1);
+}
+
+/* ── Night Lab: dark terminal, retro-game accents ── */
+:root[data-theme="night"],
+[data-theme-preview="night"] {
+  color-scheme: dark;
+  --bg:        #0a1016;
+  --bg-2:      #0f1720;
+  --bg-3:      #16212c;
+  --bg-4:      #1e2c38;
+  --fg:        #e4eef5;
+  --fg-dim:    #8fa3b3;
+  --fg-faint:  #5d7385;
+  --border:    #22323f;
+  --border-2:  #2e4252;
+  --accent:    #4ade80;
+  --accent-ink:#06220f;
+  --accent-2:  #fbbf24;
+  --accent-3:  #38bdf8;
+  --good:      #4ade80;
+  --bad:       #f87171;
+  --warn:      #fbbf24;
+  --shadow:    0 10px 30px -12px rgba(0,0,0,.8);
+  --glow:      0 0 0 1px rgba(74,222,128,.35), 0 0 22px -6px rgba(74,222,128,.45);
+  --font-display: var(--font-mono);
+  --grid-line: rgba(74,222,128,.05);
+}
+
+/* ── Arcade: bright, friendly, Duolingo-ish ── */
+:root[data-theme="arcade"],
+[data-theme-preview="arcade"] {
+  color-scheme: light;
+  --bg:        #f3f7fb;
+  --bg-2:      #ffffff;
+  --bg-3:      #eaf1f8;
+  --bg-4:      #dde8f3;
+  --fg:        #16222e;
+  --fg-dim:    #5a6b7c;
+  --fg-faint:  #8697a7;
+  --border:    #d7e2ee;
+  --border-2:  #bfd0e0;
+  --accent:    #22c55e;
+  --accent-ink:#ffffff;
+  --accent-2:  #f59e0b;
+  --accent-3:  #3b82f6;
+  --good:      #16a34a;
+  --bad:       #ef4444;
+  --warn:      #d97706;
+  --shadow:    0 8px 20px -10px rgba(22,34,46,.28);
+  --glow:      0 0 0 3px rgba(34,197,94,.22);
+  --r-md: 14px;
+  --r-lg: 22px;
+  /* Stated explicitly so a preview card inherits the right face from :root. */
+  --font-display: var(--font-ui);
+  --grid-line: rgba(59,130,246,.05);
+}
+
+/* ── Seminar: clean academic, minimal game chrome ── */
+:root[data-theme="seminar"],
+[data-theme-preview="seminar"] {
+  color-scheme: light;
+  --bg:        #fbfaf7;
+  --bg-2:      #ffffff;
+  --bg-3:      #f4f2ed;
+  --bg-4:      #e9e6df;
+  --fg:        #1c1a17;
+  --fg-dim:    #5c574f;
+  --fg-faint:  #8a847a;
+  --border:    #e0dcd3;
+  --border-2:  #c9c3b7;
+  --accent:    #1f6f4a;
+  --accent-ink:#ffffff;
+  --accent-2:  #8c5a16;
+  --accent-3:  #2f5d8a;
+  --good:      #1f6f4a;
+  --bad:       #a8322a;
+  --warn:      #8c5a16;
+  --shadow:    0 2px 10px -6px rgba(28,26,23,.25);
+  --glow:      0 0 0 2px rgba(31,111,74,.2);
+  --r-sm: 3px; --r-md: 5px; --r-lg: 8px;
+  --font-display: Georgia, "Iowan Old Style", "Times New Roman", serif;
+  --grid-line: transparent;
+}
