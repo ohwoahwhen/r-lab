@@ -91,7 +91,7 @@ export default {
         'vc <- as.data.frame(VarCorr(m))\n' +
         'round(vc$vcov[1] / sum(vc$vcov), 3)',
       debrief:
-        "ICC = .285, so a bit over a quarter of the leftover variation is stable differences in how " +
+        "ICC = .282, so a bit over a quarter of the leftover variation is stable differences in how " +
         "fast people are. Three quarters is trial-to-trial noise — which is reaction time for you.",
       check: `local({
   m <- lmerTest::lmer(rt ~ condition + (1 | pid), data = rt_clean)
@@ -139,7 +139,7 @@ export default {
       solution:
         'm <- lmer(rt ~ condition + (1 | pid), data = rt_clean)\n\nsummary(m)',
       debrief:
-        "The condition effect gets df = 6546 — nearly the trial count — because with only a random " +
+        "The condition effect gets df = 6544 — nearly the trial count — because with only a random " +
         "intercept the model believes every trial is near-independent evidence about the effect. " +
         "Hold that number in mind for two missions' time.",
       check: `local({
@@ -191,8 +191,8 @@ export default {
       ],
       solution: 'lmer(rt ~ condition + (1 + condition | pid), data = rt_clean)',
       debrief:
-        "Look at the standard error for `conditionincongruent`: it has gone from 1.77 to 4.36, and the " +
-        "degrees of freedom from 6546 to 39. Nothing about the data changed. The first model was simply " +
+        "Look at the standard error for `conditionincongruent`: it has gone from 1.78 to 4.29, and the " +
+        "degrees of freedom from 6544 to 39. Nothing about the data changed. The first model was simply " +
         "too confident, because it assumed everyone had the same effect and counted every trial as " +
         "evidence about one shared number.\n\n" +
         "That gap is the single best argument for fitting random slopes.",
@@ -244,7 +244,7 @@ export default {
         'm2 <- lmer(rt ~ condition + (1 + condition | pid), data = rt_clean)\n\n' +
         'anova(m1, m2)',
       debrief:
-        "χ²(2) = 132.31, p < .001. The random slopes are not optional here — people genuinely differ in " +
+        "χ²(2) = 126.41, p < .001. The random slopes are not optional here — people genuinely differ in " +
         "how much congruency costs them, and a model that denies it is misrepresenting the data.",
       check: `local({
   m1 <- lmerTest::lmer(rt ~ condition + (1 | pid), data = rt_clean)
@@ -288,7 +288,7 @@ export default {
         'per_person <- coef(m)$pid\n' +
         'per_person$conditionincongruent',
       debrief:
-        "They run from about −29 ms to +97 ms. One participant is reliably **faster** on incongruent " +
+        "They run from about −32 ms to +94 ms. One participant is reliably **faster** on incongruent " +
         "trials, and another pays nearly a tenth of a second. The group mean of 55 ms is a real " +
         "description of the average and a poor description of almost everybody.\n\n" +
         "This is what a paper means when it reports an effect \"in the sample\" and someone asks whether " +

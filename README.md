@@ -46,9 +46,10 @@ from the webR package repository on first visit and cached by your browser after
 | 9 | Lines Through Clouds | regression, prediction, control variables, model comparison, dummy coding, moderation |
 | 10 | Everyone Is Different | mixed-effects models: random intercepts, ICC, Satterthwaite p values, random slopes, individual differences |
 | 11 | The Fine Print | paired designs, planned contrasts, multiplicity corrections, unequal n and Type I/II/III, sphericity, diagnostics, rank-based tests |
+| 12 | Right or Wrong | logistic regression, odds ratios, predicted probabilities, deviance tests, generalised mixed models |
 
-76 missions in all, including eleven boss challenges and two recreate-the-chart tasks.
-Levels 7 to 11 fetch `effectsize`, `psych`, `car`, `afex`, `emmeans`, `lme4` and `lmerTest`
+83 missions in all, including twelve boss challenges and two recreate-the-chart tasks.
+Levels 7 to 12 fetch `effectsize`, `psych`, `car`, `afex`, `emmeans`, `lme4` and `lmerTest`
 the first time you open one — about 20 MB that the earlier levels never download.
 
 The datasets are simulated but deliberately messy — typo'd category labels, missing values,

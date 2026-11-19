@@ -179,8 +179,9 @@ a conference deadline, a reviewer who wants effect sizes).
 | 9 | Lines Through Clouds | `lm`, `predict`, control variables, `anova()` model comparison, dummy coding, moderation | `hikes_clean`, `wellbeing_scored` | Regression reported in APA words |
 | 10 | Everyone Is Different | `lmer`, variance components and ICC, Satterthwaite p values, random slopes, likelihood ratio tests, `coef()` per participant | `rt_clean` | Mixed model reported in APA words |
 | 11 | The Fine Print | paired t and *dz*, planned `contrast()`, `p.adjust` families, Type I/II/III with unequal n, sphericity and Greenhouse–Geisser, `vif()` and residual diagnostics, `wilcox.test` | `wellbeing_scored`, `pavlov_long`, `hikes_clean` | Pre-registered primary result |
+| 12 | Right or Wrong | `glm(family = binomial)`, odds ratios, predicted probabilities, deviance and likelihood ratio tests, `glmer` | `rt_acc` | Logistic mixed model reported |
 
-5–8 missions + 1 boss per level, **76 challenges** in total.
+5–8 missions + 1 boss per level, **83 challenges** in total.
 
 ### Statistical correctness
 
@@ -255,6 +256,13 @@ settings page and the ⌨ panel render from it.
 8. Playtest every challenge in a real browser; fix.
 9. Repo + Pages deploy; verify live link on desktop and phone widths.
 
+**Stage 6 — level 12 — done**
+19. Binary outcomes: the `correct` column, which the whole course had been filtering away.
+20. `rt_task` gained by-participant variation in accuracy (log-odds SD 0.55) so `glmer`'s random
+    intercept is estimable rather than a singular fit. That changed which trials `rt_clean`
+    keeps, so every figure quoted in level 10's debriefs was re-measured and updated.
+21. New derived dataset `rt_acc`: the same cleaning as `rt_clean` but with errors kept.
+
 **Stage 5 — level 11 — done**
 17. The statistical-coverage audit above, the corrections to levels 7 and 8, and level 11 itself.
 18. Save codes decoupled from the level registry: `MISSION_SLOTS` is a frozen, append-only list,
@@ -278,7 +286,7 @@ settings page and the ⌨ panel render from it.
 12. Playtest; deploy.
 
 **Later (TODO.md keeps these)**
-Level 12+ (generalised mixed models for accuracy data), a sandbox console, mission search,
+A sandbox console, mission search,
 "explain my error" hints keyed to R error text, keyboard-only play, PWA offline cache.
 
 ### APA string grading

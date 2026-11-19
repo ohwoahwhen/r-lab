@@ -69,11 +69,22 @@ Live: https://ohwoahwhen.github.io/r-lab/ · Plan: [PLAN.md](PLAN.md)
       can be inserted anywhere without invalidating a code; `npm test` enforces it
 - [x] All 76 missions replayed: 0 failed, 0 weak hints
 
+## Stage 6 — level 12 — DONE (20 Nov 2026)
+- [x] Level 12 Right or Wrong — `glm(family = binomial)`, odds ratios and why they are not
+      risk ratios, predicted probabilities, deviance and likelihood ratio tests, `glmer`,
+      and why the traditional t-test on per-person proportions is worse
+- [x] `rt_task` gained by-participant accuracy variation so `glmer`'s random intercept is
+      estimable; level 10's quoted figures re-measured and updated as a result
+- [x] New derived dataset `rt_acc` — same cleaning as `rt_clean`, errors kept
+- [x] Corrected a factual error written into level 12's first draft: since R 4.4,
+      `anova()` on two GLMs runs the chi-square test by default, so `test = "Chisq"` is
+      no longer required. The theory now explains the version difference
+- [x] All 83 missions replayed: 0 failed, 0 weak hints
+
 ## Backlog
-- [ ] Level 12: generalised mixed models — `glmer` on the trial-level `correct` column,
-      which is already in `rt_task` and currently unused
 - [ ] Still not covered anywhere: power analysis and sample-size planning, chi-square and
-      categorical outcomes, bootstrapping, Bayes factors, meta-analytic thinking
+      contingency tables, bootstrapping, equivalence testing (TOST), Bayes factors,
+      mediation, meta-analytic thinking
 - [ ] Free-play console screen with all datasets loaded
 - [ ] Error-aware hints: match common R error text → targeted advice
       (e.g. "could not find function" → "did you forget the library, or misspell it?")

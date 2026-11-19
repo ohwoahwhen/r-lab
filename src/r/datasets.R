@@ -93,7 +93,13 @@ rlab_make_rt <- function() {
   anti <- sample.int(n, 46);  rt[anti]  <- round(runif(length(anti), 80, 149))
   laps <- sample.int(n, 58);  rt[laps]  <- round(runif(length(laps), 2100, 5400))
 
-  correct <- rbinom(n, 1, ifelse(grid$condition == "incongruent", 0.91, 0.97))
+  # Accuracy varies by person too, on the log-odds scale, so a binary mixed
+  # model has a random intercept worth estimating rather than a singular fit.
+  pacc <- setNames(rnorm(40, 0, 0.55), pids)
+  p_correct <- plogis(
+    qlogis(ifelse(grid$condition == "incongruent", 0.91, 0.97)) + pacc[grid$pid]
+  )
+  correct <- rbinom(n, 1, p_correct)
   correct[sample.int(n, 90)] <- NA
 
   # condition label case drift between testing sessions
@@ -311,6 +317,12 @@ rlab_make_derived <- function(env) {
     dplyr::mutate(condition = tolower(condition)) |>
     dplyr::filter(rt > 150, rt < 2000, !is.na(correct), correct == 1)
 
+  # Same cleaning, but errors kept: the outcome for level 12 is whether the
+  # response was correct, so filtering to correct trials would delete it.
+  rt_acc <- g("rt_task") |>
+    dplyr::mutate(condition = tolower(condition)) |>
+    dplyr::filter(rt > 150, rt < 2000, !is.na(correct))
+
   wellbeing_scored <- g("wellbeing") |>
     dplyr::mutate(
       .g = stringr::str_to_lower(stringr::str_trim(group)),
@@ -328,6 +340,7 @@ rlab_make_derived <- function(env) {
   assign("hikes_clean", hikes_clean, envir = env)
   assign("pavlov_long", pavlov_long, envir = env)
   assign("rt_clean", rt_clean, envir = env)
+  assign("rt_acc", rt_acc, envir = env)
   assign("wellbeing_scored", wellbeing_scored, envir = env)
 }
 
@@ -354,7 +367,8 @@ rlab_build_data <- function(env = globalenv()) {
 
 rlab_datasets <- c("wellbeing", "rt_task", "pavlov", "hikes", "fitness",
                    "sydney_property", "yt", "trail_info",
-                   "hikes_clean", "pavlov_long", "rt_clean", "wellbeing_scored")
+                   "hikes_clean", "pavlov_long", "rt_clean", "rt_acc",
+                   "wellbeing_scored")
 
 # A compact peek used by the mission brief panel.
 rlab_peek <- function(name, n = 6) {

@@ -18,8 +18,9 @@ import l8 from './level08.js';
 import l9 from './level09.js';
 import l10 from './level10.js';
 import l11 from './level11.js';
+import l12 from './level12.js';
 
-export const LEVELS = [l1, l2, l3, l4, l5, l6, l7, l8, l9, l10, l11];
+export const LEVELS = [l1, l2, l3, l4, l5, l6, l7, l8, l9, l10, l11, l12];
 
 /** Levels that are planned but not written yet, shown greyed on the map. */
 export const COMING_SOON = [];
@@ -47,6 +48,8 @@ export const MISSION_SLOTS = Object.freeze([
   'l10m6', 'l10boss',
   'l11m1', 'l11m2', 'l11m3', 'l11m4', 'l11m5', 'l11m6',
   'l11m7', 'l11boss',
+  'l12m1', 'l12m2', 'l12m3', 'l12m4', 'l12m5', 'l12m6',
+  'l12boss',
 ]);
 
 export function missionOrder() {
