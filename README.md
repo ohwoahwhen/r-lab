@@ -32,10 +32,17 @@ from the webR package repository on first visit and cached by your browser after
 | 3 | Making Numbers | `mutate`, `across`, `summarise`, `group_by`, `count` |
 | 4 | Tidying Up | `pivot_longer`/`wider`, splitting columns, joins, missing data |
 | 5 | First Light | `ggplot`, `aes`, geoms, distributions, labels |
-| 6–8 | *in progress* | ggplot polish · t-tests, correlations, effect sizes, APA · ANOVA |
+| 6 | Polish | facets, scales, manual colours, themes, annotation |
+| 7 | Numbers That Mean Something | descriptives, Cronbach's alpha, t-tests, correlations, Cohen's d, APA reporting |
+| 8 | The Analysis | one-way ANOVA, eta squared, Levene's test, `emmeans` post-hocs, mixed ANOVA with `afex`, simple effects |
+
+53 missions in all, including eight boss challenges and two recreate-the-chart tasks.
+Levels 7 and 8 fetch `effectsize`, `psych`, `car`, `afex` and `emmeans` the first time you
+open one — about 20 MB that the earlier levels never download.
 
 The datasets are simulated but deliberately messy — typo'd category labels, missing values,
-wide formats, numbers stored as text — because that is what real data looks like.
+wide formats, numbers stored as text — because that is what real data looks like. Levels 6–8
+hand you tidied versions of them, which are exactly what the level 1–4 boss missions build.
 
 ## Running it locally
 

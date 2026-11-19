@@ -11,15 +11,14 @@ import l2 from './level02.js';
 import l3 from './level03.js';
 import l4 from './level04.js';
 import l5 from './level05.js';
+import l6 from './level06.js';
+import l7 from './level07.js';
+import l8 from './level08.js';
 
-export const LEVELS = [l1, l2, l3, l4, l5];
+export const LEVELS = [l1, l2, l3, l4, l5, l6, l7, l8];
 
 /** Levels that are planned but not written yet, shown greyed on the map. */
-export const COMING_SOON = [
-  { n: 6, title: 'Polish', blurb: 'Facets, themes, scales, colour and annotation.' },
-  { n: 7, title: 'Numbers That Mean Something', blurb: 'Descriptives, t-tests, correlations, effect sizes, APA reporting.' },
-  { n: 8, title: 'The Analysis', blurb: 'ANOVA, assumptions, emmeans and interactions.' },
-];
+export const COMING_SOON = [];
 
 export function missionOrder() {
   return LEVELS.flatMap((l) => l.missions.map((m) => m.id));

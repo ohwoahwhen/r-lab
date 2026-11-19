@@ -31,6 +31,13 @@ export function setProgressHandler(fn) { onProgress = fn; }
 
 export const engineState = () => ({ ready, installed: [...installed] });
 
+/** True once the levels 7-8 statistics packages are installed and loaded. */
+export function statsReady() {
+  return STATS_PACKAGES.every((p) => installed.has(p)) && statsLoaded;
+}
+
+let statsLoaded = false;
+
 export async function bootEngine() {
   const t0 = performance.now();
   onProgress('fetch', 4, `Fetching webR ${WEBR_VERSION}`);
@@ -81,23 +88,40 @@ async function installPackages(pkgs, from, to) {
   onProgress('packages', to, 'Packages installed');
 }
 
-/** Install the stats packages on demand (levels 7-8). */
-export async function ensureStatsPackages(report = () => {}) {
-  const missing = STATS_PACKAGES.filter((p) => !installed.has(p));
-  if (!missing.length) return { ok: true, loaded: [] };
-  const failed = [];
-  for (let i = 0; i < missing.length; i++) {
-    report(missing[i], i / missing.length);
-    try {
-      await webR.installPackages([missing[i]]);
-      installed.add(missing[i]);
-    } catch (err) {
-      failed.push(missing[i]);
+/**
+ * Install and load the statistics packages on demand, the first time a
+ * level 7 or 8 mission is opened. They are ~20 MB that levels 1-6 never need.
+ * Runs at most once; concurrent callers share the same promise.
+ */
+let statsPromise = null;
+
+export function ensureStatsPackages(report = () => {}) {
+  if (statsReady()) return Promise.resolve({ ok: true, failed: [], loadFailed: [] });
+  if (statsPromise) return statsPromise;
+  statsPromise = (async () => {
+    const failed = [];
+    for (let i = 0; i < STATS_PACKAGES.length; i++) {
+      const pkg = STATS_PACKAGES[i];
+      report(pkg, i / STATS_PACKAGES.length);
+      if (installed.has(pkg)) continue;
+      try {
+        await webR.installPackages([pkg]);
+        installed.add(pkg);
+      } catch (err) {
+        failed.push(pkg);
+      }
     }
-  }
-  const bad = await evalStrings(`rlab_load(c(${STATS_PACKAGES.filter((p) => installed.has(p)).map(q).join(', ')}))`);
-  report(null, 1);
-  return { ok: failed.length === 0, failed, loadFailed: bad[0] === 'OK' ? [] : bad };
+    const have = STATS_PACKAGES.filter((p) => installed.has(p));
+    const bad = have.length
+      ? await evalStrings(`rlab_load(c(${have.map(q).join(', ')}))`)
+      : ['none installed'];
+    const loadFailed = bad[0] === 'OK' ? [] : bad;
+    statsLoaded = failed.length === 0 && loadFailed.length === 0;
+    report(null, 1);
+    if (!statsLoaded) statsPromise = null;   // let the user retry
+    return { ok: statsLoaded, failed, loadFailed };
+  })();
+  return statsPromise;
 }
 
 /* ───────── low level helpers ───────── */

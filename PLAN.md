@@ -34,7 +34,8 @@ Non-goals: no account system, no server, no analytics, no paid services.
 | Deploy | GitHub Actions → Pages (`actions/deploy-pages`) | No `gh-pages` branch to babysit |
 | Styling | Hand-written CSS with design tokens | Three togglable themes; no Tailwind build weight |
 | Datasets | Generated in R at boot from a seeded script | No CSV fetches, deterministic, reset-able per mission |
-| Stats packages | Lazy-installed on entering levels 7–8 | Keeps first load lighter |
+| Stats packages | Lazy-installed on entering levels 7–8 | Keeps first load lighter (~20 MB the first six levels never need) |
+| Levels 6–8 data | Pre-tidied `hikes_clean`, `pavlov_long`, `rt_clean`, `wellbeing_scored` | They are exactly what the level 1–4 bosses produce, so the earlier work visibly pays off and the later levels are about plots and statistics, not re-cleaning |
 
 ### Package availability (checked against repo.r-wasm.org)
 
@@ -42,8 +43,16 @@ Core (eager): `dplyr 1.2.1`, `tidyr 1.3.2`, `ggplot2 4.0.3`, `readr 2.2.0`, `str
 `forcats 1.0.1`, `tibble`, `purrr`.
 Stats (lazy, level 7–8): `effectsize 1.0.3`, `psych 2.6.9`, `afex 1.5-1`, `emmeans 2.0.4`, `car 3.1-5`.
 
-Both `afex` and `emmeans` exist as wasm builds, so level 8 uses them with a base-R `aov` +
-`pairwise.t.test` fallback if loading fails at runtime.
+Both `afex` and `emmeans` exist as wasm builds and were verified end to end in the browser:
+a 2×2 mixed ANOVA, a 2×2×8 three-way, `emmeans` simple effects and `effectsize` all run. The
+base-R fallback sketched in the first draft of this plan was **not built** — shipping an
+untested parallel content path would have been worse than the honest failure message the
+loader now shows if the packages ever will not install.
+
+> `emmeans` builds model terms from factor levels, and `CS+` is not a legal R name: it is
+> silently mangled to `CS.`, with `CS-` becoming `CS..1`, so you cannot tell them apart.
+> `pavlov_long` keeps the readable `CS+`/`CS-` for plotting in level 6, and level 8 teaches
+> `fct_recode()` as the fix — a real lesson rather than a hidden workaround.
 
 > ggplot2 is 4.0.x, where plot objects are S7. All `ggplot_build()` introspection used by the
 > chart grader must be verified against 4.0 in a real browser, not assumed from ggplot2 3.x.
@@ -146,12 +155,12 @@ a conference deadline, a reviewer who wants effect sizes).
 | 2 | The Filter Room | `select`, helpers, `filter`, `arrange` | `sydney_property`, `wellbeing` | Multi-condition property query |
 | 3 | Making Numbers | `mutate`, `across`, `summarise`, `group_by`, `count` | `hikes`, `wellbeing`, `fitness` | Reverse-score + scale score |
 | 4 | Tidying Up | `pivot_longer/wider`, `separate_wider_delim`, joins, NA handling | `fitness`, `rt_task`, `yt` | Messy wide → tidy long pipeline |
-| 5 | First Light | `ggplot`, `aes`, geoms, `labs` | `hikes`, `rt_task`, `sydney_property` | Recreate the chart |
-| 6 | Polish | facets, themes, scales, colour, annotation | `pavlov`, `yt` | Recreate a publication figure |
-| 7 | Numbers That Mean Something | descriptives, `t.test`, `cor.test`, Cohen's d, APA strings | `wellbeing`, `rt_task` | Full APA results paragraph |
-| 8 | The Analysis | `aov`/`afex`, assumptions, `emmeans`, interactions | `pavlov`, `rt_task` | Mixed ANOVA + follow-ups |
+| 5 | First Light | `ggplot`, `aes`, geoms, `labs` | `hikes`, `rt_task` | Recreate the chart |
+| 6 | Polish | facets, scales, colour, themes, annotation | `hikes_clean`, `pavlov_long` | Recreate a publication figure with error bars |
+| 7 | Numbers That Mean Something | descriptives, Cronbach's alpha, `t.test`, `cor.test`, Cohen's d, APA strings | `wellbeing_scored` | Full APA results sentence |
+| 8 | The Analysis | `aov`, eta squared, Levene, `emmeans`, `afex` mixed ANOVA, simple effects | `wellbeing_scored`, `pavlov_long` | Interaction reported in APA words |
 
-5 missions + 1 boss per level, 48 challenges total.
+5–6 missions + 1 boss per level, **53 challenges** in total.
 
 ### Datasets (all seeded, all deliberately messy)
 
@@ -180,14 +189,21 @@ a conference deadline, a reviewer who wants effect sizes).
 8. Playtest every challenge in a real browser; fix.
 9. Repo + Pages deploy; verify live link on desktop and phone widths.
 
-**Stage 2 — levels 6–8**
-10. Lazy stats package install with its own progress UI.
-11. Levels 6, 7, 8 (18 challenges) incl. APA-string checkers and ANOVA with afex/emmeans + base-R fallback.
+**Stage 2 — levels 6–8 — done**
+10. Lazy stats package install, gated per level with its own progress UI and a retry path.
+11. Levels 6, 7, 8 (21 challenges) incl. APA-string checkers and a mixed ANOVA with afex/emmeans.
 12. Playtest; deploy.
 
 **Later (TODO.md keeps these)**
 Level 9+ (regression, mixed models), a sandbox console with all datasets, mission search,
 "explain my error" hints keyed to R error text, keyboard-only play, PWA offline cache.
+
+### APA string grading
+
+Sentence missions are graded twice over: a regex for the *shape* (brackets, commas, decimal
+places, no leading zero on p) and then `rlab_want_nums()`, which pulls every number out of the
+sentence and compares it, in order, to the value recomputed from the data. So the feedback can
+say "the Control mean is 33.50 in your sentence, it should be 30.77" rather than "wrong".
 
 ---
 

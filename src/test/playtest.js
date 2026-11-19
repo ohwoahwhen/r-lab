@@ -4,7 +4,8 @@
  * every wrong answer in wrong.js (must fail, with feedback that mentions the
  * right thing). Results land on window.__RESULTS for scripted inspection.
  */
-import { bootEngine, setProgressHandler, runCode, gradeAnswer } from '../r/engine.js';
+import * as engine from '../r/engine.js';
+import { bootEngine, setProgressHandler, runCode, gradeAnswer, ensureStatsPackages } from '../r/engine.js';
 import { LEVELS } from '../content/levels.js';
 import { WRONG } from './wrong.js';
 
@@ -18,6 +19,8 @@ const log = (s, cls = '') => {
 
 const results = { pass: [], fail: [], weak: [], startedAt: Date.now() };
 window.__RESULTS = results;
+// Exposed so a probe can reuse this page's live R session.
+window.__eng = engine;
 window.__DONE = false;
 
 setProgressHandler((stage, pct, detail) => {
@@ -34,6 +37,20 @@ async function main() {
   log('R ready. Playing every mission.', 'h');
 
   const only = new URLSearchParams(location.search).get('only');
+
+  // Levels 7-8 need the statistics packages, which the app fetches lazily.
+  const needStats = LEVELS.some((l) => l.needsStats
+    && l.missions.some((m) => !only || m.id.startsWith(only)));
+  if (needStats) {
+    log('Installing the statistics packages…', 'h');
+    const st = await ensureStatsPackages((pkg) => { if (pkg) log(`  ${pkg}`, 'dim'); });
+    if (!st.ok) {
+      results.fail.push({ id: 'STATS', why: 'stats packages failed', detail: JSON.stringify(st) });
+      log(`FAIL — statistics packages did not load: ${JSON.stringify(st)}`, 'bad');
+    } else {
+      log('Statistics packages ready.', 'ok');
+    }
+  }
 
   for (const level of LEVELS) {
     for (const m of level.missions) {

@@ -2,7 +2,7 @@ import { findMission, nextMission, LEVELS } from '../../content/levels.js';
 import { esc, md, mdp, toast, modal } from '../dom.js';
 import { createEditor } from '../editor.js';
 import { drawImages } from '../plot.js';
-import { runCode, gradeAnswer, renderPlot, peekData, shapeData } from '../../r/engine.js';
+import { runCode, gradeAnswer, renderPlot, peekData, shapeData, ensureStatsPackages, statsReady } from '../../r/engine.js';
 import {
   completeMission, countTry, hintsUsed, isDone, useHint, HINT_COSTS, missionRecord,
 } from '../../game/state.js';
@@ -112,6 +112,35 @@ export function renderMission(root, { go, missionId }) {
   drawSolution();
   loadPeeks();
   if (mission.target) loadTarget();
+  if (level.needsStats) ensureStats();
+
+  /* ───────── statistics packages, fetched on first use ───────── */
+
+  async function ensureStats() {
+    if (statsReady()) return;
+    const run = $('#run'); const submit = $('#submit');
+    run.disabled = true; submit.disabled = true;
+    const show = (html) => { $('#verdict').innerHTML = html; };
+    show(`<div class="verdict"><div class="verdict__title"><span class="running"><i></i><i></i><i></i></span> Fetching the statistics packages</div>
+      <p style="margin:0" id="stat-note">This level needs afex, emmeans, effectsize, psych and car — about 20 MB that the earlier levels never download. Once only; your browser caches them.</p></div>`);
+    const res = await ensureStatsPackages((pkg) => {
+      const n = $('#stat-note');
+      if (n && pkg) n.textContent = `Installing ${pkg}…`;
+    });
+    if (res.ok) {
+      run.disabled = false; submit.disabled = false;
+      show('');
+      toast('Statistics packages ready.', 'good', 2000);
+    } else {
+      const broken = [...(res.failed || []), ...(res.loadFailed || [])].join(', ');
+      show(`<div class="verdict verdict--fail">
+        <div class="verdict__title">Could not load the statistics packages</div>
+        <p style="margin:0">These would not install or load: <code>${esc(broken)}</code>.
+        That is usually a network problem. Reload the page to try again — the missions in
+        levels 1–6 still work without them.</p>
+      </div>`);
+    }
+  }
 
   /* ───────── hints & solution ───────── */
 
@@ -265,6 +294,7 @@ export function renderMission(root, { go, missionId }) {
 
   async function doRun() {
     if (busy) return;
+    if (level.needsStats && !statsReady()) { await ensureStats(); if (!statsReady()) return; }
     setBusy(true, 'Running your R…');
     try {
       const res = await execute();
@@ -280,6 +310,7 @@ export function renderMission(root, { go, missionId }) {
 
   async function doSubmit() {
     if (busy) return;
+    if (level.needsStats && !statsReady()) { await ensureStats(); if (!statsReady()) return; }
     setBusy(true, 'Running and grading…');
     try {
       const res = await execute();

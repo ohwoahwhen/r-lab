@@ -269,6 +269,63 @@ rlab_make_trail_info <- function() {
   )
 }
 
+
+# ── derived: the tidy versions the level 1-5 bosses build ────────────
+# Levels 6-8 are about plotting and statistics, not re-doing the cleaning,
+# so these are handed over ready-made. Each one is exactly what the matching
+# boss mission produces.
+
+rlab_make_derived <- function(env) {
+  g <- function(n) get(n, envir = env)
+
+  hikes_clean <- g("hikes") |>
+    dplyr::mutate(trail = stringr::str_to_title(stringr::str_trim(trail))) |>
+    dplyr::left_join(g("trail_info"), by = "trail") |>
+    dplyr::filter(!is.na(region)) |>
+    tidyr::separate_wider_regex(duration,
+      patterns = c(hours = "\\d+", "h ", mins = "\\d+", "m")) |>
+    dplyr::mutate(
+      total_min = as.numeric(hours) * 60 + as.numeric(mins),
+      pace_min_km = round(total_min / distance_km, 2)
+    ) |>
+    dplyr::select(date, trail, region, grade, distance_km, elev_m, pack_kg,
+                  total_min, pace_min_km, avg_hr)
+
+  pavlov_long <- g("pavlov") |>
+    tidyr::pivot_longer(dplyr::starts_with("cs"),
+      names_to = c("cue", "block"), names_pattern = "cs(plus|minus)_b(\\d+)",
+      values_to = "ratio") |>
+    dplyr::mutate(
+      cue = factor(ifelse(cue == "plus", "CS+", "CS-"), levels = c("CS+", "CS-")),
+      block = as.integer(block),
+      drug = factor(drug, levels = c("saline", "amphetamine"))
+    ) |>
+    tidyr::drop_na(ratio)
+
+  rt_clean <- g("rt_task") |>
+    dplyr::mutate(condition = tolower(condition)) |>
+    dplyr::filter(rt > 150, rt < 2000, !is.na(correct), correct == 1)
+
+  wellbeing_scored <- g("wellbeing") |>
+    dplyr::mutate(
+      .g = stringr::str_to_lower(stringr::str_trim(group)),
+      group = dplyr::case_when(
+        stringr::str_detect(.g, "^c") ~ "Control",
+        stringr::str_detect(.g, "^m") ~ "Mindfulness",
+        .default = "Exercise")
+    ) |>
+    dplyr::select(-.g) |>
+    tidyr::drop_na(dplyr::starts_with("ses")) |>
+    dplyr::mutate(dplyr::across(c(ses2, ses5, ses6, ses8, ses9), ~ 6 - .x)) |>
+    dplyr::mutate(ses_total = rowSums(dplyr::across(dplyr::starts_with("ses")))) |>
+    dplyr::mutate(group = factor(group, levels = c("Control", "Mindfulness", "Exercise")))
+
+  assign("hikes_clean", hikes_clean, envir = env)
+  assign("pavlov_long", pavlov_long, envir = env)
+  assign("rt_clean", rt_clean, envir = env)
+  assign("wellbeing_scored", wellbeing_scored, envir = env)
+}
+
 # ── builder ──────────────────────────────────────────────────────────
 rlab_build_data <- function(env = globalenv()) {
   mk <- list(
@@ -286,11 +343,13 @@ rlab_build_data <- function(env = globalenv()) {
     if (requireNamespace("tibble", quietly = TRUE)) d <- tibble::as_tibble(d)
     assign(nm, d, envir = env)
   }
+  rlab_make_derived(env)
   invisible(names(mk))
 }
 
 rlab_datasets <- c("wellbeing", "rt_task", "pavlov", "hikes", "fitness",
-                   "sydney_property", "yt", "trail_info")
+                   "sydney_property", "yt", "trail_info",
+                   "hikes_clean", "pavlov_long", "rt_clean", "wellbeing_scored")
 
 # A compact peek used by the mission brief panel.
 rlab_peek <- function(name, n = 6) {

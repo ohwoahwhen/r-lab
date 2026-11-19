@@ -181,7 +181,7 @@ rlab_near <- function(a, b, tol = 1e-6) {
 
 rlab_fmt <- function(x, k = 3) {
   if (is.numeric(x)) {
-    v <- ifelse(is.na(x), "NA", formatC(round(x, k), format = "fg", digits = 7))
+    v <- trimws(ifelse(is.na(x), "NA", formatC(round(x, k), format = "fg", digits = 7)))
   } else v <- as.character(x)
   if (length(v) > 6) v <- c(v[1:6], "...")
   paste(v, collapse = ", ")
@@ -514,4 +514,279 @@ rlab_want_scale <- function(p, pattern, msg) {
   sc <- rlab_scale_names(p)
   if (!any(grepl(pattern, sc, ignore.case = TRUE))) return(msg)
   character(0)
+}
+
+# ── level 6: scales, themes, annotations, coords ─────────────────────
+
+rlab_scale_list <- function(p) {
+  s <- rlab_prop(p, "scales")
+  sc <- tryCatch(s$scales, error = function(e) NULL)
+  if (is.null(sc)) list() else sc
+}
+
+rlab_scale_for <- function(p, aes) {
+  for (s in rlab_scale_list(p)) {
+    a <- tryCatch(s$aesthetics, error = function(e) character(0))
+    if (aes %in% a) return(s)
+  }
+  NULL
+}
+
+rlab_scale_call <- function(s) {
+  txt <- tryCatch(paste(deparse(s$call), collapse = " "), error = function(e) "")
+  if (is.null(txt) || !nzchar(txt)) "a scale" else txt
+}
+
+rlab_scale_trans <- function(s) {
+  n <- tryCatch(s$trans$name, error = function(e) NULL)
+  if (is.null(n)) n <- tryCatch(s$transform$name, error = function(e) NULL)
+  if (is.null(n)) "identity" else n
+}
+
+rlab_want_scale_for <- function(p, aes, what) {
+  if (!rlab_is_gg(p)) return(character(0))
+  if (is.null(rlab_scale_for(p, aes)))
+    return(sprintf("Nothing sets the `%s` scale. %s", aes, what))
+  character(0)
+}
+
+rlab_want_trans <- function(p, aes, trans) {
+  if (!rlab_is_gg(p)) return(character(0))
+  s <- rlab_scale_for(p, aes)
+  if (is.null(s))
+    return(sprintf("The `%s` axis is still on its default scale — it needs a `scale_%s_%s()`.",
+                   aes, aes, if (trans == "log-10") "log10" else "continuous"))
+  got <- rlab_scale_trans(s)
+  if (!identical(got, trans))
+    return(sprintf("The `%s` axis uses the \"%s\" transform, I expected \"%s\". You wrote `%s`.",
+                   aes, got, trans, rlab_scale_call(s)))
+  character(0)
+}
+
+rlab_want_limits <- function(p, aes, limits) {
+  if (!rlab_is_gg(p)) return(character(0))
+  s <- rlab_scale_for(p, aes)
+  if (is.null(s))
+    return(sprintf("Nothing limits the `%s` axis. Set it with `scale_%s_continuous(limits = c(%s))`.",
+                   aes, aes, paste(limits, collapse = ", ")))
+  got <- tryCatch(s$limits, error = function(e) NULL)
+  if (is.null(got) || !rlab_near(got, limits, 1e-9))
+    return(sprintf("The `%s` limits are %s, I expected %s.", aes,
+                   if (is.null(got)) "not set" else paste0("c(", rlab_fmt(got), ")"),
+                   paste0("c(", paste(limits, collapse = ", "), ")")))
+  character(0)
+}
+
+rlab_want_breaks <- function(p, aes, breaks) {
+  if (!rlab_is_gg(p)) return(character(0))
+  s <- rlab_scale_for(p, aes)
+  got <- tryCatch(s$breaks, error = function(e) NULL)
+  if (is.null(s) || is.null(got) || is.function(got))
+    return(sprintf("The `%s` axis is still choosing its own breaks. Set `breaks = c(%s)`.",
+                   aes, paste(breaks, collapse = ", ")))
+  if (!rlab_near(sort(got), sort(breaks), 1e-9))
+    return(sprintf("The `%s` breaks are %s, I expected %s.", aes, rlab_fmt(got), rlab_fmt(breaks)))
+  character(0)
+}
+
+# `values` must be named by level, e.g. c("CS+" = "#ef4444", "CS-" = "#94a3b8").
+# The scale is cloned and trained on those levels, so the student may supply
+# their colours named or positional, in any order, and still be graded on the
+# mapping that actually ends up on the plot.
+rlab_want_manual_colours <- function(p, aes, values) {
+  if (!rlab_is_gg(p)) return(character(0))
+  s <- rlab_scale_for(p, aes)
+  if (is.null(s))
+    return(sprintf("Nothing sets the `%s` scale \u2014 add `scale_%s_manual(values = ...)`.", aes, aes))
+  lv <- names(values)
+  got <- tryCatch({
+    s2 <- s$clone()
+    s2$train(factor(lv, levels = lv))
+    s2$map(lv)
+  }, error = function(e) NULL)
+  if (is.null(got))
+    return(sprintf("The `%s` scale isn't a manual one. You wrote `%s`.", aes, rlab_scale_call(s)))
+  norm <- function(x) tolower(gsub("[[:space:]]", "", as.character(x)))
+  bad <- which(norm(got) != norm(unname(values)))
+  if (length(bad))
+    return(sprintf("%s is drawn in %s, it should be %s.",
+                   paste0("`", lv[bad[1]], "`"),
+                   if (is.na(got[bad[1]])) "the default colour" else paste0("\"", got[bad[1]], "\""),
+                   paste0("\"", unname(values)[bad[1]], "\"")))
+  character(0)
+}
+
+rlab_theme <- function(p) rlab_prop(p, "theme")
+
+rlab_want_theme_fn <- function(p, fn) {
+  if (!rlab_is_gg(p)) return(character(0))
+  th <- rlab_theme(p)
+  if (is.null(th) || !length(th))
+    return(sprintf("No theme is set — add `%s()`.", fn))
+  if (!isTRUE(attr(th, "complete")))
+    return(sprintf("You have tweaked the theme with `theme(...)`, but not replaced it. Add `%s()` as well.", fn))
+  ref <- tryCatch(do.call(fn, list()), error = function(e) NULL)
+  if (is.null(ref)) return(character(0))
+  keys <- c("panel.border", "panel.background", "panel.grid.major",
+            "panel.grid.minor", "axis.line", "legend.key", "strip.background")
+  same <- vapply(keys, function(k)
+    identical(class(th[[k]])[1], class(ref[[k]])[1]), logical(1))
+  if (!all(same))
+    return(sprintf("A complete theme is set, but it isn't `%s()`.", fn))
+  character(0)
+}
+
+rlab_want_theme_arg <- function(p, arg, value) {
+  if (!rlab_is_gg(p)) return(character(0))
+  th <- rlab_theme(p)
+  got <- tryCatch(th[[arg]], error = function(e) NULL)
+  if (is.null(got))
+    return(sprintf("`%s` isn't set. Add `theme(%s = \"%s\")`.", arg, arg, value))
+  if (!identical(as.character(got)[1], as.character(value)[1]))
+    return(sprintf("`%s` is \"%s\", I expected \"%s\".", arg, paste(as.character(got), collapse = " "), value))
+  character(0)
+}
+
+rlab_layer_param <- function(p, layer, param) {
+  ls <- rlab_layers(p)
+  if (length(ls) < layer) return(NULL)
+  v <- tryCatch(ls[[layer]]$aes_params[[param]], error = function(e) NULL)
+  v
+}
+
+rlab_geom_index <- function(p, geom) {
+  g <- rlab_geoms(p)
+  w <- which(g == geom)
+  if (!length(w)) NA_integer_ else w[1]
+}
+
+rlab_want_hline <- function(p, yintercept, linetype = NULL) {
+  if (!rlab_is_gg(p)) return(character(0))
+  i <- rlab_geom_index(p, "hline")
+  if (is.na(i))
+    return(sprintf("There is no reference line. Add `geom_hline(yintercept = %s)`.", yintercept))
+  got <- tryCatch(rlab_layers(p)[[i]]$data$yintercept, error = function(e) NULL)
+  if (is.null(got) || !rlab_near(got[1], yintercept, 1e-9))
+    return(sprintf("The reference line is at %s, it should be at %s.",
+                   if (is.null(got)) "an unknown height" else rlab_fmt(got[1]), yintercept))
+  if (!is.null(linetype)) {
+    lt <- rlab_layer_param(p, i, "linetype")
+    if (is.null(lt) || !identical(as.character(lt)[1], linetype))
+      return(sprintf("The reference line is %s, it should be `linetype = \"%s\"`.",
+                     if (is.null(lt)) "solid" else paste0("\"", lt, "\""), linetype))
+  }
+  character(0)
+}
+
+rlab_want_annotation <- function(p, label) {
+  if (!rlab_is_gg(p)) return(character(0))
+  i <- rlab_geom_index(p, "text")
+  if (is.na(i))
+    return(sprintf("There is no text on the plot. Add `annotate(\"text\", x = ..., y = ..., label = \"%s\")`.", label))
+  got <- rlab_layer_param(p, i, "label")
+  if (is.null(got)) {
+    got <- tryCatch(rlab_layers(p)[[i]]$data$label, error = function(e) NULL)
+  }
+  if (is.null(got) || !any(tolower(trimws(as.character(got))) == tolower(trimws(label))))
+    return(sprintf("The annotation says %s, it should say \"%s\".",
+                   if (is.null(got)) "nothing I can read" else paste0("\"", got[1], "\""), label))
+  character(0)
+}
+
+rlab_want_coord <- function(p, cls) {
+  if (!rlab_is_gg(p)) return(character(0))
+  got <- class(rlab_prop(p, "coordinates"))[1]
+  if (!identical(got, cls))
+    return(sprintf("The coordinate system is `%s`, I expected `%s`.", got, cls))
+  character(0)
+}
+
+# ── levels 7-8: statistics objects and APA strings ───────────────────
+
+# Every number in a string, including APA p values written as ".019".
+rlab_nums <- function(x) {
+  m <- regmatches(x, gregexpr("-?[0-9]*\\.?[0-9]+(e[-+]?[0-9]+)?", x, perl = TRUE))[[1]]
+  suppressWarnings(as.numeric(m))
+}
+
+rlab_want_htest <- function(x, what = "a hypothesis test") {
+  if (!inherits(x, "htest"))
+    return(sprintf("Your answer should be %s, but it is %s. %s",
+                   what, rlab_desc(x), rlab_hint_lastline()))
+  character(0)
+}
+
+rlab_want_method <- function(x, pattern, msg) {
+  m <- tryCatch(x$method, error = function(e) "")
+  if (!length(m) || !grepl(pattern, m, ignore.case = TRUE)) return(msg)
+  character(0)
+}
+
+rlab_want_field <- function(x, field, expected, label, tol = 1e-3) {
+  got <- tryCatch(x[[field]], error = function(e) NULL)
+  if (is.null(got))
+    return(sprintf("I couldn't find %s in your answer.", label))
+  rlab_want_value(unname(got)[1], unname(expected)[1], label, tol = tol)
+}
+
+# APA: three decimals, no leading zero, and "< .001" when it is tiny.
+rlab_apa_p <- function(p) {
+  if (p < .001) "< .001" else sub("^0", "", sprintf("%.3f", p))
+}
+
+rlab_want_apa_p_format <- function(s) {
+  if (grepl("p\\s*[=<]\\s*0\\.", s))
+    return("APA drops the leading zero on a p value, because p can never be bigger than 1. Write `p = .019`, not `p = 0.019`.")
+  if (grepl("p\\s*=\\s*0*\\.000", s))
+    return("A p value that rounds to .000 is reported as `p < .001`, never `p = .000`.")
+  character(0)
+}
+
+rlab_want_string <- function(x) {
+  if (!is.character(x) || length(x) != 1)
+    return(sprintf("Your answer should be a single piece of text, but it is %s. %s",
+                   rlab_desc(x), rlab_hint_lastline()))
+  if (!nzchar(trimws(x))) return("Your answer is an empty string.")
+  character(0)
+}
+
+# Compares the numbers in a sentence, in order, to the numbers that are true.
+rlab_want_nums <- function(s, expected, labels, tol = 0.006) {
+  got <- rlab_nums(s)
+  if (length(got) != length(expected))
+    return(sprintf("I found %d number%s in your sentence but expected %d (%s). Check the template.",
+                   length(got), if (length(got) == 1) "" else "s", length(expected),
+                   paste(labels, collapse = ", ")))
+  bad <- which(!vapply(seq_along(got), function(i)
+    rlab_near(got[i], expected[i], 0) || abs(got[i] - expected[i]) <= tol, logical(1)))
+  if (length(bad))
+    return(sprintf("The %s is %s in your sentence, it should be %s.",
+                   labels[bad[1]], rlab_fmt(got[bad[1]]), rlab_fmt(expected[bad[1]])))
+  character(0)
+}
+
+rlab_anova_row <- function(x, term) {
+  tab <- NULL
+  if (inherits(x, "afex_aov")) tab <- as.data.frame(x$anova_table)
+  else if (inherits(x, "summary.aov") || is.list(x) && inherits(x[[1]], "anova"))
+    tab <- as.data.frame(x[[1]])
+  else if (inherits(x, "aov")) tab <- as.data.frame(summary(x)[[1]])
+  else if (inherits(x, "anova") || is.data.frame(x)) tab <- as.data.frame(x)
+  if (is.null(tab)) return(NULL)
+  rn <- trimws(rownames(tab))
+  i <- which(rn == term)
+  if (!length(i)) return(NULL)
+  tab[i[1], , drop = FALSE]
+}
+
+rlab_anova_col <- function(row, which) {
+  if (is.null(row)) return(NULL)
+  nm <- colnames(row)
+  hit <- switch(which,
+    F = nm[grepl("^F( value)?$", nm)],
+    p = nm[grepl("^(Pr\\(>F\\)|p\\.value|p)$", nm)],
+    df = nm[grepl("^(num Df|Df)$", nm)],
+    character(0))
+  if (!length(hit)) return(NULL)
+  unname(row[[hit[1]]])
 }
